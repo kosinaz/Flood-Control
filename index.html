@@ -18,38 +18,66 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create
 
 function preload() {
 
-    game.load.image('sky', 'assets/platform.png');
-    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+    game.load.spritesheet('tileset', 'assets/tileset.png', 40, 40);
 
 }
 
 var buildings;
+var intersections;
+var streets;
 
+var cityX = 180;
+var cityWidth = 420;
+var cityY = 80;
+var cityHeight = 420;
 var score = 0;
 
 function create() {
 
     //  A simple background for our game
-    game.add.sprite(0, 0, 'sky');
+    game.stage.backgroundColor = "#0000ff";
 
     //  The buildings group contains the initial barricades of the flood
     buildings = game.add.group();
 
-    // The player and its settings
-    player = game.add.sprite(0, 0, 'dude');
+    //  The intersections group contains the unbarricadable streets of the city
+    intersections = game.add.group();
+
+    //  The streets where barricades can be built
+    streets = game.add.group();
 
     //  Here we'll create 12 of them evenly spaced apart
-    for (var i = 0; i < 12; i++)
-    {
-        //  Create a building inside of the 'buildings' group
-        var building = buildings.create(i * 70, 0, 'building');
+    for (var x = cityX + 40; x < cityX + cityWidth; x += 80) {
+        for (var y = cityY + 40; y < cityY + cityHeight; y += 80) {
+
+            //  Create a building inside of the 'buildings' group
+            var building = buildings.create(x, y, 'tileset', 6);
+        }
+    }
+    for (var x = cityX; x < cityX + cityWidth; x += 80) {
+        for (var y = cityY + 40; y < cityY + cityHeight; y += 80) {
+            //  Create a clickable button on the horizontal street
+            var street = game.make.button(x, y, 'tileset', actionOnClick, this, 1, 0, 2);
+            streets.add(street);
+        }
+    }
+    for (var x = cityX + 40; x < cityX + cityWidth; x += 80) {
+        for (var y = cityY; y < cityY + cityHeight; y += 80) {
+            //  Create a clickable button on the vertical street
+            var street = game.make.button(x, y, 'tileset', actionOnClick, this, 4, 3, 5);
+            streets.add(street);
+        }
+    }
+    for (var x = cityX; x < cityX + cityWidth; x += 80) {
+        for (var y = cityY; y < cityY + cityHeight; y += 80) {
+            //  Create a clickable button on the vertical street
+            var intersection = intersections.create(x, y, 'tileset', 7);
+            intersections.add(intersection);
+        }
     }
 
     //  The score
-    scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-
-    //  Our controls.
-    cursors = game.input.keyboard.createCursorKeys();
+    scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#fff' });
     
 }
 
@@ -59,6 +87,11 @@ function update() {
 
 }
 
+function actionOnClick () {
+
+
+
+}
 </script>
 
 </body>
