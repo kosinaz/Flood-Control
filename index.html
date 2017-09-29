@@ -70,7 +70,7 @@ function create() {
     }
     for (var x = cityX; x < cityX + cityWidth; x += 80) {
         for (var y = cityY; y < cityY + cityHeight; y += 80) {
-            //  Create a clickable button on the vertical street
+            //  Create an intersection inside of the 'instersections' group
             var intersection = intersections.create(x, y, 'tileset', 7);
             intersections.add(intersection);
         }
