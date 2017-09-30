@@ -13,6 +13,7 @@ var streets;
 var water;
 var graphics;
 var timer;
+var spreadTimer;
 
 var x;
 var y;
@@ -22,10 +23,11 @@ var tileX;
 var tileY;
 var cityX = 220;
 var cityY = 180;
-var barricades = 3;
+var barricades = 4;
 var barricadeCounter;
 var countdownTimer;
 var startTime = 6;
+var floodContinues = false;
 
 function create() {
     
@@ -40,7 +42,7 @@ function create() {
  
     // A timer to count the seconds before the flood
     timer = game.time.create(true);
-    timer.loop(startTime * 1000, flood, this);
+    timer.loop(startTime * 1000, startFlood, this);
     timer.start();
 
     // Display how many seconds left to build
@@ -140,7 +142,7 @@ function buildBarricade() {
     }
 }
 
-function flood() {
+function startFlood() {
 
     // Stop the timer to start the flood
     timer.stop();
@@ -182,12 +184,76 @@ function flood() {
         water.create(tileX, tileY, 'tileset', 19)
 
         // Set the right border
-        levels[0][0][levels[0][0].length - 1][y] = 3;
+        levels[0][levels[0][0].length - 1][y] = 3;
 
         // Fill the current position with water
-        water.create(tileX + (levels[0][0].length - 1) * tileHeight, tileY, 'tileset', 19)
+        water.create(tileX + (levels[0][0].length - 1) * tileWidth, tileY, 'tileset', 19)
     }
 
     // Make sure that the water will be displayed on top of the street
     game.world.bringToTop(water);
+
+    // Spread the water every half seconds
+    spreadTimer = game.time.create(false);
+    spreadTimer.loop(500, continueFlood, this);
+    spreadTimer.start();
+}
+
+function continueFlood() {
+
+    // Spread the water
+    for (x = 0; x < levels[0].length; x += 1) {
+        for (y = 0; y < levels[0][0].length; y += 1) {
+
+            // Find the neighbors of the flooded areas
+            if (levels[0][x][y] === 3) {
+
+                // The x position of the current tile
+                tileX = cityX + x * tileWidth;
+                
+                // The y position of the current tile
+                tileY = cityY + y * tileHeight;
+
+                // Flood the left neighbor if possible
+                if (levels[0][x + 1] && levels[0][x + 1][y] === 1) {
+                    levels[0][x + 1][y] = 4;
+                    water.create(tileX + tileWidth, tileY, 'tileset', 19)
+                }
+                
+                // Flood the right neighbor if possible
+                if (levels[0][x - 1] && levels[0][x - 1][y] === 1) {
+                    levels[0][x - 1][y] = 4;
+                    water.create(tileX - tileWidth, tileY, 'tileset', 19)
+                }
+                
+                // Flood the top neighbor if possible
+                if (levels[0][x][y + 1] && levels[0][x][y + 1] === 1) {
+                    levels[0][x][y + 1] = 4;
+                    water.create(tileX, tileY + tileHeight, 'tileset', 19)
+                }
+                
+                // Flood the bottom neighbor if possible
+                if (levels[0][x][y - 1] && levels[0][x][y - 1] === 1) {
+                    levels[0][x][y - 1] = 4;
+                    water.create(tileX, tileY - tileHeight, 'tileset', 19)
+                }
+            }
+        }
+    }
+
+    // Set the newly spreaded water
+    floodContinues = false;
+    for (x = 0; x < levels[0].length; x += 1) {
+        for (y = 0; y < levels[0][0].length; y += 1) {
+            if (levels[0][x][y] === 4) {
+                levels[0][x][y] = 3;
+                floodContinues = true;
+            }
+        }
+    }
+
+    // If there are no more streets to flood stop
+    if (floodContinues === false) {
+        spreadTimer.stop();
+    }
 }
