@@ -103,8 +103,13 @@ function create() {
 
 function update() {
 
-        // Update how many seconds left to build
-        countdownTimer.text = '0:0' + Math.floor(timer.duration / 1000);
+    // Update how many seconds left to build
+    countdownTimer.text = '0:0' + Math.floor(timer.duration / 1000);
+
+    // Update the countdown timer bar of the flood
+    graphics.beginFill(0x0000ff);
+    graphics.drawRect(200, 40, Math.min(timer.ms / 6000 * 400, 400), 40);
+    graphics.endFill();
 }
 
 function actionOnClick() {
