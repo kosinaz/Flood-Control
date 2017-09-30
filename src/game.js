@@ -10,6 +10,7 @@ function preload() {
 var levels;
 var buildings;
 var streets;
+var graphics;
 
 var x;
 var y;
@@ -25,7 +26,13 @@ var barricadeCounter;
 function create() {
 
     // A simple background for our game
-    game.stage.backgroundColor = "#0000ff";
+    game.stage.backgroundColor = "#00f";
+
+    // A simple header for our game
+    graphics = game.add.graphics(0, 0);
+    graphics.beginFill("#000");
+    graphics.drawRect(0, 0, 800, 120);
+    graphics.endFill();
 
     // The external level data containg buildings and streets
     levels = game.cache.getJSON('levels');
