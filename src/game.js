@@ -11,6 +11,7 @@ var levels;
 var buildings;
 var streets;
 var graphics;
+var timer;
 
 var x;
 var y;
@@ -18,22 +19,50 @@ var tileWidth = 40;
 var tileHeight = 40;
 var tileX;
 var tileY;
-var cityX = 200;
-var cityY = 160;
+var cityX = 220;
+var cityY = 180;
 var barricades = 3;
 var barricadeCounter;
+var countdownTimer;
 
 function create() {
-
+    
     // A simple background for our game
     game.stage.backgroundColor = "#00f";
-
+    
     // A simple header for our game
     graphics = game.add.graphics(0, 0);
-    graphics.beginFill("#000");
+    graphics.beginFill(0x000000);
     graphics.drawRect(0, 0, 800, 120);
     graphics.endFill();
+ 
+    // A timer to count the seconds before the flood
+    timer = game.time.create(true);
+    timer.loop(7000, flood, this);
+    timer.start();
 
+    // Display how many seconds left to build
+    countdownTimer = game.add.text(65, 40, '0:00', { 
+        font: 'bold 30pt Arial',
+        fill: '#fff',
+        boundsAlignH: 'right',
+        boundsAlignV: 'middle'
+    });
+
+    // The countdown timer bar of the flood
+    graphics.beginFill(0x888888);
+    graphics.drawRect(200, 40, 400, 40);
+    graphics.endFill();
+
+    // Display how many barricades left to build
+    barricadeCounter = game.add.text(665, 40, barricades, { 
+        font: 'bold 30pt Arial',
+        fill: '#fff',
+        boundsAlignH: 'right',
+        boundsAlignV: 'middle'
+    });
+    game.add.image(700, 40, 'tileset', 18);
+    
     // The external level data containg buildings and streets
     levels = game.cache.getJSON('levels');
 
@@ -70,24 +99,15 @@ function create() {
             }
         }
     }    
-
-    // Display how many barricades left to build
-    barricadeCounter = game.add.text(45, 40, barricades, { 
-        font: 'bold 30pt Arial',
-        fill: '#fff',
-        boundsAlignH: 'right',
-        boundsAlignV: 'middle'
-    });
-    game.add.image(80, 40, 'tileset', 18);
-
 }
-
 
 function update() {
-    
+
+        // Update how many seconds left to build
+        countdownTimer.text = '0:0' + Math.floor(timer.duration / 1000);
 }
 
-function actionOnClick () {
+function actionOnClick() {
     
     // Build a barricade on the selected street
     buildings.create(arguments[0].x, arguments[0].y, 'tileset', 18);
@@ -107,4 +127,8 @@ function actionOnClick () {
             element.inputEnabled = false;
         }, this);
     }
+}
+
+function flood() {
+
 }
