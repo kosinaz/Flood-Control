@@ -17,8 +17,10 @@ var tileWidth = 40;
 var tileHeight = 40;
 var tileX;
 var tileY;
-var cityX = 180;
-var cityY = 80;
+var cityX = 200;
+var cityY = 160;
+var barricades = 3;
+var barricadeCounter;
 
 function create() {
 
@@ -52,15 +54,25 @@ function create() {
             } else if (x % 2 || y % 2) {
 
                 // Build a street suitable for a barricade on every second tile
-                game.add.button(tileX, tileY, 'tileset', actionOnClick, this, 17, 1, 18);
+                streets.add(game.add.button(tileX, tileY, 'tileset', actionOnClick, this, 17, 1, 18));
 
             } else {
 
                 // Build an intersection on every other tile
-                streets.create(tileX, tileY, 'tileset', 1);
+                game.add.image(tileX, tileY, 'tileset', 1);
             }
         }
     }    
+
+    // Display how many barricades left to build
+    barricadeCounter = game.add.text(45, 40, barricades, { 
+        font: 'bold 30pt Arial',
+        fill: '#fff',
+        boundsAlignH: 'right',
+        boundsAlignV: 'middle'
+    });
+    game.add.image(80, 40, 'tileset', 18);
+
 }
 
 
@@ -75,4 +87,17 @@ function actionOnClick () {
     
     // Make sure that the barricades will be displayed above the street
     game.world.bringToTop(buildings);
+
+    // Decrease the number of buildable barricades
+    barricades -= 1;
+
+    // Update the barricade counter
+    barricadeCounter.text = barricades;
+
+    // If there are no more barricades, disable building on the remaining streets
+    if (barricades < 1) {
+        streets.children.forEach(function(element) {
+            element.inputEnabled = false;
+        }, this);
+    }
 }
