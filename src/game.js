@@ -28,6 +28,8 @@ var barricadeCounter;
 var countdownTimer;
 var startTime = 6;
 var floodContinues = false;
+var points = 0;
+var pointCounter;
 
 function create() {
     
@@ -66,7 +68,18 @@ function create() {
         boundsAlignV: 'middle'
     });
     game.add.image(700, 40, 'tileset', 18);
-    
+
+    // Display the points
+    graphics.beginFill(0x000000);
+    graphics.drawCircle(740, 540, 120);
+    graphics.endFill();
+    pointCounter = game.add.text(690, 460, '' + points, { 
+        font: 'bold 90pt Arial',
+        fill: '#fff',
+        boundsAlignH: 'right',
+        boundsAlignV: 'middle'
+    });
+
     // The external level data containg buildings and streets
     levels = game.cache.getJSON('levels');
 
@@ -252,8 +265,21 @@ function continueFlood() {
         }
     }
 
-    // If there are no more streets to flood stop
+    // If there are no more streets to flood stop and evaluate
     if (floodContinues === false) {
         spreadTimer.stop();
+        for (x = 0; x < levels[0].length; x += 1) {
+            for (y = 0; y < levels[0][0].length; y += 1) {
+                if (levels[0][x][y] === 1) {
+
+                    // Give points for every dry street
+                    points += 1;
+
+                }
+            }
+        }
+        
+        // Update the pointCounter
+        pointCounter.text = points;
     }
 }
