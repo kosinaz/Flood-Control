@@ -11,7 +11,7 @@ var menuState = {
             var button = game.add.button(
                 (i % 5) * 80 + 40,
                 Math.floor(i / 5) * 120 + 40,
-                'tileset',
+                'ui',
                 function () {
                     game.currentLevel = arguments[0].data;
                     game.state.start('play');

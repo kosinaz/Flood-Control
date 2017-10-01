@@ -12,6 +12,9 @@ var playState = {
     // Store the level data
     level: [],
 
+    // Store the level image objects
+    levelImage: [],
+
     // Store the streets suitable for barricades
     streets: [],
 
@@ -47,23 +50,19 @@ var playState = {
 
                 // Set the left border
                 level[0][i] = 3;
-                point = this.toIsometric(0, i);
-                game.add.image(point.x, point.y, 'tileset', 19)
+                this.levelImage[0][i].frame = 5;
 
                 // Set the right border
                 level[level.length - 1][i] = 3;
-                point = this.toIsometric(level.length - 1, i);
-                game.add.image(point.x, point.y, 'tileset', 19)
+                this.levelImage[level.length - 1][i].frame = 5;
 
                 // Set the top border
                 level[i][0] = 3;
-                point = this.toIsometric(i, 0);
-                game.add.image(point.x, point.y, 'tileset', 19)
+                this.levelImage[i][0].frame = 5;
 
                 // Set the bottom border
                 level[i][level.length - 1] = 3;
-                point = this.toIsometric(i, level.length - 1);
-                game.add.image(point.x, point.y, 'tileset', 19)
+                this.levelImage[i][level.length - 1].frame = 5;
             }
 
             // Create a timer to update the flood
@@ -90,12 +89,8 @@ var playState = {
                     for (y = 0; y < level[0].length; y += 1) {
                         if (level[x][y] === 4) {
 
-                            // The position of the current tile
-                            point = this.toIsometric(x, y);
-
-                            // Fill with water
-                            game.add.image(point.x, point.y, 'tileset', 19)
                             level[x][y] = 3;
+                            this.levelImage[x][y].frame = 5;
                             floodContinues = true;
                         }
                     }
@@ -154,13 +149,14 @@ var playState = {
         })
 
         // Create the back button
-        game.add.button(720, 40, 'tileset', function () {
+        game.add.button(720, 40, 'ui', function () {
             game.state.start('menu');
         }, this, 111, 110);
 
         // Create the map
         streets = game.add.group()
         for (x = 0; x < level.length; x += 1) {
+            this.levelImage[x] = [];
             for (y = 0; y < level.length; y += 1) {
 
                 // The position of the current tile
@@ -170,26 +166,26 @@ var playState = {
                 if (!level[x][y]) {
 
                     // Build a building
-                    game.add.image(point.x, point.y, 'tileset', 0)
+                    this.levelImage[x][y] = game.add.image(point.x, point.y, 'tileset', 0);
 
                 } else if (x % 2 || y % 2) {
 
                     // Build a street suitable for a barricade on every second tile
-                    street = game.add.button(point.x, point.y, 'tileset', this.buildBarricade, this, 17, 1, 18);
-
-                    // Add the original positon of the barricade to the button
+                    this.levelImage[x][y] = game.add.image(point.x, point.y, 'tileset', 1);
+                    street = game.add.button(point.x, point.y, 'tileset', this.buildBarricade, this, 3, 6);
+                    streets.add(street);
+                    
+                    // Add the original position of the barricade to the button
                     street.data = {
                         x: x,
                         y: y
                     }
-
-                    // Add the street to the group of streets
-                    streets.add(street);
+                    game.world.bringToTop(streets);
 
                 } else {
 
                     // Build an intersection on every other tile
-                    game.add.image(point.x, point.y, 'tileset', 1);
+                    this.levelImage[x][y] = game.add.image(point.x, point.y, 'tileset', 1);
                 }
             }
         }
@@ -201,8 +197,9 @@ var playState = {
         arguments[0].inputEnabled = false;
 
         // Build a barricade on the selected street
-        game.add.image(arguments[0].x, arguments[0].y, 'tileset', 18);
+        this.levelImage[arguments[0].data.x][arguments[0].data.y].frame = 2;
         level[arguments[0].data.x][arguments[0].data.y] = 2;
+        arguments[0].destroy();
 
         // Decrease the number of buildable barricades
         game.barricades -= 1;
@@ -220,8 +217,8 @@ var playState = {
 
     toIsometric: function (x, y) {
        return {
-           x: (x - y) * 40 + 400,
-           y: (x + y) * 20 + 120
+           x: (x - y) * 48 + 340,
+           y: (x + y) * 24 + 120
        }
     }
 };

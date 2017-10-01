@@ -1,11 +1,11 @@
 var loadState = {
     preload: function () {
 
-        // Create a loading text
-        game.add.text(10, 10, 'loading...', {fill: '#fff'});
-
         // Load the tileset
-        game.load.spritesheet('tileset', 'assets/tileset.png', 40, 40);
+        game.load.spritesheet('tileset', 'assets/tileset.png', 96, 72);
+
+        // Load the UI elements
+        game.load.spritesheet('ui', 'assets/ui.png', 40, 40);
 
         // Load the level data
         game.load.json('levels', 'data/levels.json');
