@@ -35,9 +35,11 @@ var x;
 var y;
 var tileX;
 var tileY;
-var points = 0;
 var currentLevel = 0;
 var maxLevel = 0;
+
+// Level specific variables
+var points = [];
 var barricades;
 var floodContinues;
 
@@ -58,6 +60,7 @@ function selectLevel() {
     // Buttons to start the levels
     levelButtons = game.add.group();
 
+    // Display the level selection buttons
     for (y = 0; y < 3; y += 1) {
         for (x = 0; x < 5; x += 1) {
 
@@ -65,17 +68,34 @@ function selectLevel() {
             tileX = cityX + x * tileWidth * 2;
             
             // The y position of the current tile
-            tileY = cityY + y * tileHeight * 2;
+            tileY = cityY + y * tileHeight * 3;
 
+            // Set the button
             levelButton = game.add.button(tileX, tileY, 'tileset', startLevel, this, 80 + y * 5 + x, 20 + y * 5 + x);
+            
+            // Add the level index to the button
             levelButton.data = y * 5 + x;
+
+            // Group the button
             levelButtons.add(levelButton);
 
+            // Disable the levels that haven't been unlocked yet
             if (y * 5 + x > maxLevel) {
+
+                // Disable the button
                 levelButton.inputEnabled = false;
+
+                // Display the button as disabled
                 levelButton.setFrames(50 + y * 5 + x, 50 + y * 5 + x);
             }
-                
+
+            // Display the record
+            levelButtons.add(game.add.text(tileX + 7, tileY + 40, points[y * 5 + x], { 
+                font: 'bold 30pt Arial',
+                fill: '#fff',
+                boundsAlignH: 'right',
+                boundsAlignV: 'middle'
+            }));
         }
     }
 }
@@ -123,7 +143,7 @@ function startLevel() {
     graphics.beginFill(0x000000);
     graphics.drawCircle(740, 540, 200);
     graphics.endFill();
-    pointCounter = game.add.text(680, 480, '' + points, { 
+    pointCounter = game.add.text(710, 490, '0', { 
         font: 'bold 60pt Arial',
         fill: '#fff',
         boundsAlignH: 'right',
@@ -136,11 +156,14 @@ function startLevel() {
     
     // Set the countdown timer
     timer.add(startTime * 1000, startFlood, this);
-
+    
     // Display the countdown timer bar
     graphics.beginFill(0x888888);
     graphics.drawRect(200, 40, 400, 40);
     graphics.endFill();
+    
+    // Set the points
+    points[currentLevel] = 0;
     
     // Start the countdown timer
     timer.start();
@@ -337,16 +360,16 @@ function continueFlood() {
                 if (levels[currentLevel][x][y] === 1) {
 
                     // Give points for every dry street
-                    points += 1;
+                    points[currentLevel] += 1;
 
                 }
             }
         }
 
         // Update the point counter
-        pointCounter.text = points;
+        pointCounter.text = points[currentLevel];
 
-        if (points > 0) {
+        if (points[currentLevel] > 0) {
             maxLevel = currentLevel + 1;
         }
         game.world.remove(buildings);
