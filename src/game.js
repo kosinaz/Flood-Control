@@ -73,7 +73,7 @@ function create() {
 
     // Display the points
     graphics.beginFill(0x000000);
-    graphics.drawCircle(740, 540, 120);
+    graphics.drawCircle(740, 540, 240);
     graphics.endFill();
     pointCounter = game.add.text(680, 480, '' + points, { 
         font: 'bold 60pt Arial',
