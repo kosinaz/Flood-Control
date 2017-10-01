@@ -199,7 +199,7 @@ function startFlood() {
         water.create(tileX, tileY, 'tileset', 19)
 
         // Set the bottom border
-        levels[currentLevel][x][levels[0].length - 1] = 3;
+        levels[currentLevel][x][levels[currentLevel].length - 1] = 3;
 
         // Fill the current position with water
         water.create(tileX, tileY + (levels[currentLevel].length - 1) * tileHeight, 'tileset', 19)
