@@ -22,11 +22,12 @@ var barricadeCounter;
 var barricadeIcon;
 var pointCounter;
 var spreadTimer;
+var scorebar;
 
 // Global constants
 var tileWidth = 40;
 var tileHeight = 40;
-var cityX = 180;
+var cityX = 140;
 var cityY = 140;
 var startTime = 6;
 
@@ -42,8 +43,10 @@ var maxLevel = 0;
 var point;
 var points = [];
 var barricades;
+var dryStreets;
 var level;
 var floodContinues;
+var lastAction;
 
 function create() {
 
@@ -58,6 +61,19 @@ function create() {
 }
 
 function selectLevel() {
+
+    // Hide the ingame screen if needed
+    game.world.remove(buildings);
+    game.world.remove(streets);
+    game.world.remove(water);
+    game.world.remove(graphics);
+    game.world.remove(timer);
+    game.world.remove(countdownTimer);
+    game.world.remove(barricadeCounter);
+    game.world.remove(barricadeIcon);
+    game.world.remove(pointCounter);
+    game.world.remove(spreadTimer);
+    game.world.remove(scorebar);
     
     // Buttons to start the levels
     levelButtons = game.add.group();
@@ -92,23 +108,23 @@ function selectLevel() {
             }
 
             // Display the record
-            levelButtons.add(game.add.text(tileX + 7, tileY + 40, points[y * 5 + x], { 
+            levelButtons.add(game.add.text(tileX - 10, tileY + 40, points[y * 5 + x], { 
                 font: 'bold 30pt Arial',
                 fill: '#fff',
-                boundsAlignH: 'right',
+                boundsAlignH: 'center',
                 boundsAlignV: 'middle'
-            }));
+            }).setTextBounds(0, 0, 60, 60));
         }
     }
 }
 
 function startLevel() {
 
-    // Hide the level selection buttons
-    game.world.remove(levelButtons);
-
     // Set the current level based on the clicked level button
     z = arguments[0].data;
+
+    // Hide the level selection buttons
+    levelButtons.destroy();
 
     // A simple header for our game
     graphics = game.add.graphics(0, 0);
@@ -118,6 +134,7 @@ function startLevel() {
  
     // A timer to count the seconds before the flood
     timer = game.time.create(false);
+    lastAction = 0;
 
     // A timer to follow the flooding water
     spreadTimer = game.time.create(false);
@@ -145,12 +162,13 @@ function startLevel() {
     graphics.beginFill(0x000000);
     graphics.drawCircle(740, 540, 200);
     graphics.endFill();
-    pointCounter = game.add.text(710, 490, points[z] || '0', { 
+    pointCounter = game.add.text(700, 500, points[z] || '0', { 
         font: 'bold 60pt Arial',
         fill: '#fff',
-        boundsAlignH: 'right',
+        boundsAlignH: 'center',
         boundsAlignV: 'middle'
     });
+    pointCounter.setTextBounds(0, 0, 80, 80);
     
     // Set the barricades
     barricades = 4;
@@ -245,6 +263,9 @@ function buildBarricade() {
             element.inputEnabled = false;
         }, this);
     }
+
+    // Save the time of the action
+    lastAction = Math.ceil(timer.duration / 1000);
 }
 
 function startFlood() {
@@ -357,41 +378,90 @@ function continueFlood() {
     }
 
     // If there are no more streets to flood stop and evaluate
-    point = 0;
     if (floodContinues === false) {
+
+        // Disable barricade placement
+        streets.children.forEach(function(element) {
+            element.inputEnabled = false;
+        }, this);
+
+        // Stop water spreading
         spreadTimer.stop();
-        for (x = 0; x < level.length; x += 1) {
-            for (y = 0; y < level[0].length; y += 1) {
-                if (level[x][y] === 1) {
 
-                    // Give points for every dry street
-                    point += 1;
+        // Open the score side bar
+        evaluate();
+    }
+}
 
-                }
+function evaluate() {
+
+    // Display the score sidebar
+    scorebar = game.add.group();
+
+    // Count dry streets
+    dryStreets = 0;
+    for (x = 0; x < level.length; x += 1) {
+        for (y = 0; y < level[0].length; y += 1) {
+            if (level[x][y] === 1) {
+
+                // Give points for every dry street
+                dryStreets += 1;
+
             }
         }
-        if (points[z]) {
-            points[z] = Math.max(points[z], point);
-        } else {
-            points[z] = point;
-        }
-
-        // Update the point counter
-        pointCounter.text = points[z];
-
-        if (points[z] > 0) {
-            maxLevel = z + 1;
-        }
-        game.world.remove(buildings);
-        game.world.remove(streets);
-        game.world.remove(water);
-        game.world.remove(graphics);
-        game.world.remove(timer);
-        game.world.remove(countdownTimer);
-        game.world.remove(barricadeCounter);
-        game.world.remove(barricadeIcon);
-        game.world.remove(pointCounter);
-        game.world.remove(spreadTimer);
-        selectLevel();
     }
+
+    // Display dry street score
+    scorebar.add(game.add.image(560, 140, 'tileset', 1));
+    scorebar.add(game.add.text(600, 140, ' * ' + dryStreets + ' = ' + dryStreets * 10, { 
+        font: 'bold 30pt Arial',
+        fill: '#fff',
+        boundsAlignH: 'right',
+        boundsAlignV: 'middle'
+    }));
+    
+    // Display unplaced barricade score
+    scorebar.add(game.add.image(560, 200, 'tileset', 18));
+    scorebar.add(game.add.text(600, 200, ' * ' + barricades + ' = ' + barricades * 2, { 
+        font: 'bold 30pt Arial',
+        fill: '#fff',
+        boundsAlignH: 'right',
+        boundsAlignV: 'middle'
+    }));
+
+    // Display unused time score
+    scorebar.add(game.add.text(580, 260, '0:0' + lastAction + ' = ' + lastAction, { 
+        font: 'bold 30pt Arial',
+        fill: '#fff',
+        boundsAlignH: 'right',
+        boundsAlignV: 'middle'
+    }));
+
+    // Display total
+    point = dryStreets * 10 + barricades * 2 + lastAction;
+    scorebar.add(game.add.text(560, 260, '______\n' + point, { 
+        font: 'bold 45pt Arial',
+        fill: '#fff',
+        align: 'center',
+        boundsAlignH: 'right',
+        boundsAlignV: 'middle'
+    }));
+    
+    // Update the record if the current points are higher
+    if (points[z]) {
+        points[z] = Math.max(points[z], point);
+    } else {
+        points[z] = point;
+    }
+    
+    // Update the point counter
+    pointCounter.text = points[z];
+    
+    // Unlock the next level
+    if (points[z] > 0) {
+        maxLevel = z + 1;
+    }
+
+    // Back to level selection screen button
+    scorebar.add(game.add.button(740, 0, 'tileset', selectLevel, this, 111, 110));
 }
