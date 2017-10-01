@@ -123,6 +123,19 @@ function selectLevel() {
             }).setTextBounds(0, 0, 60, 60));
         }
     }
+
+    // Sum all level scores
+    point = 0;
+    for (x = 0; x < points.length; x += 1) {
+        point += points[x];
+    }
+    levelButtons.add(game.add.text(140, 420, '___________\n' + point, { 
+        font: 'bold 45pt Arial',
+        fill: '#fff',
+        align: 'center',
+        boundsAlignH: 'right',
+        boundsAlignV: 'middle'
+    }));
 }
 
 function startLevel() {
@@ -254,6 +267,9 @@ function update() {
 
 function buildBarricade() {
     
+    // Disable future builds on the just built barricade
+    arguments[0].inputEnabled = false;
+
     // Build a barricade on the selected street
     buildings.create(arguments[0].x, arguments[0].y, 'tileset', 18);
     level[(arguments[0].x - cityX) / 40][(arguments[0].y - cityY) / 40] = 2;
@@ -468,7 +484,7 @@ function evaluate() {
     pointCounter.text = points[z];
     
     // Unlock the next level
-    if (points[z] > 0) {
+    if (points[z] > 30) {
         maxLevel = z + 1;
     }
 }
