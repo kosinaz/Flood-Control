@@ -23,8 +23,8 @@ var spreadTimer;
 // Global constants
 var tileWidth = 40;
 var tileHeight = 40;
-var cityX = 220;
-var cityY = 180;
+var cityX = 180;
+var cityY = 140;
 var startTime = 6;
 
 // Global variables
@@ -73,7 +73,7 @@ function create() {
 
     // Display the points
     graphics.beginFill(0x000000);
-    graphics.drawCircle(740, 540, 240);
+    graphics.drawCircle(740, 540, 200);
     graphics.endFill();
     pointCounter = game.add.text(680, 480, '' + points, { 
         font: 'bold 60pt Arial',
