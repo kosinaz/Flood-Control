@@ -10,6 +10,8 @@ function preload() {
 
 // Global game objects
 var levels;
+
+// Level specific objects
 var buildings;
 var streets;
 var water;
@@ -17,6 +19,7 @@ var graphics;
 var timer;
 var countdownTimer;
 var barricadeCounter;
+var barricadeIcon;
 var pointCounter;
 var spreadTimer;
 
@@ -34,14 +37,57 @@ var tileX;
 var tileY;
 var points = 0;
 var currentLevel = 0;
+var maxLevel = 0;
 var barricades;
 var floodContinues;
 
 function create() {
-    
+
     // A simple background for our game
     game.stage.backgroundColor = "#00f";
+
+    // The external level data containing buildings and streets
+    levels = game.cache.getJSON('levels');
+
+    // Open the level selection screen
+    selectLevel();
+}
+
+function selectLevel() {
     
+    // Buttons to start the levels
+    levelButtons = game.add.group();
+
+    for (y = 0; y < 3; y += 1) {
+        for (x = 0; x < 5; x += 1) {
+
+            // The x position of the current tile
+            tileX = cityX + x * tileWidth * 2;
+            
+            // The y position of the current tile
+            tileY = cityY + y * tileHeight * 2;
+
+            levelButton = game.add.button(tileX, tileY, 'tileset', startLevel, this, 80 + y * 5 + x, 20 + y * 5 + x);
+            levelButton.data = y * 5 + x;
+            levelButtons.add(levelButton);
+
+            if (y * 5 + x > maxLevel) {
+                levelButton.inputEnabled = false;
+                levelButton.setFrames(50 + y * 5 + x, 50 + y * 5 + x);
+            }
+                
+        }
+    }
+}
+
+function startLevel() {
+
+    // Hide the level selection buttons
+    game.world.remove(levelButtons);
+
+    // Set the current level based on the clicked level button
+    currentLevel = arguments[0].data;
+
     // A simple header for our game
     graphics = game.add.graphics(0, 0);
     graphics.beginFill(0x000000);
@@ -69,7 +115,9 @@ function create() {
         boundsAlignH: 'right',
         boundsAlignV: 'middle'
     });
-    game.add.image(700, 40, 'tileset', 18);
+
+    // Display a barricade icon next to the barricade counter
+    barricadeIcon = game.add.image(700, 40, 'tileset', 18);
 
     // Display the points
     graphics.beginFill(0x000000);
@@ -81,15 +129,6 @@ function create() {
         boundsAlignH: 'right',
         boundsAlignV: 'middle'
     });
-
-    // The external level data containing buildings and streets
-    levels = game.cache.getJSON('levels');
- 
-    // Start the first level
-    startLevel(0);
-}
-
-function startLevel (z) {
     
     // Set the barricades
     barricades = 4;
@@ -98,7 +137,7 @@ function startLevel (z) {
     // Set the countdown timer
     timer.add(startTime * 1000, startFlood, this);
 
-    // Clear the countdown timer bar
+    // Display the countdown timer bar
     graphics.beginFill(0x888888);
     graphics.drawRect(200, 40, 400, 40);
     graphics.endFill();
@@ -116,8 +155,8 @@ function startLevel (z) {
     water = game.add.group();
 
     // Build all the assets of the current level data
-    for (x = 0; x < levels[z].length; x += 1) {
-        for (y = 0; y < levels[z][0].length; y += 1) {
+    for (x = 0; x < levels[currentLevel].length; x += 1) {
+        for (y = 0; y < levels[currentLevel][0].length; y += 1) {
             
             // The x position of the current tile
             tileX = cityX + x * tileWidth;
@@ -125,7 +164,7 @@ function startLevel (z) {
             // The y position of the current tile
             tileY = cityY + y * tileHeight;
             
-            if (!levels[z][x][y]) {
+            if (!levels[currentLevel][x][y]) {
 
                 // Build a building
                 buildings.create(tileX, tileY, 'tileset', 0)
@@ -138,7 +177,7 @@ function startLevel (z) {
             } else {
 
                 // Build an intersection on every other tile
-                game.add.image(tileX, tileY, 'tileset', 1);
+                streets.add(game.add.image(tileX, tileY, 'tileset', 1));
             }
         }
     }    
@@ -146,13 +185,16 @@ function startLevel (z) {
 
 function update() {
 
-    // Update how many seconds left to build
-    countdownTimer.text = '0:0' + Math.ceil(timer.duration / 1000);
+    if (timer) {
 
-    // Update the countdown timer bar of the flood
-    graphics.beginFill(0x0000ff);
-    graphics.drawRect(200, 40, (startTime * 1000 - timer.duration) / startTime * 0.4, 40);
-    graphics.endFill();
+        // Update how many seconds left to build
+        countdownTimer.text = '0:0' + Math.ceil(timer.duration / 1000);
+
+        // Update the countdown timer bar of the flood
+        graphics.beginFill(0x0000ff);
+        graphics.drawRect(200, 40, (startTime * 1000 - timer.duration) / startTime * 0.4, 40);
+        graphics.endFill();
+    }
 }
 
 function buildBarricade() {
@@ -304,9 +346,19 @@ function continueFlood() {
         // Update the point counter
         pointCounter.text = points;
 
-        // Start the next level if possible
-        if (levels[++currentLevel]) {
-            startLevel(currentLevel);
+        if (points > 0) {
+            maxLevel = currentLevel + 1;
         }
+        game.world.remove(buildings);
+        game.world.remove(streets);
+        game.world.remove(water);
+        game.world.remove(graphics);
+        game.world.remove(timer);
+        game.world.remove(countdownTimer);
+        game.world.remove(barricadeCounter);
+        game.world.remove(barricadeIcon);
+        game.world.remove(pointCounter);
+        game.world.remove(spreadTimer);
+        selectLevel();
     }
 }
