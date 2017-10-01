@@ -39,6 +39,7 @@ var tileY;
 var maxLevel = 0;
 
 // Level specific variables
+var point;
 var points = [];
 var barricades;
 var level;
@@ -144,7 +145,7 @@ function startLevel() {
     graphics.beginFill(0x000000);
     graphics.drawCircle(740, 540, 200);
     graphics.endFill();
-    pointCounter = game.add.text(710, 490, '0', { 
+    pointCounter = game.add.text(710, 490, points[z] || '0', { 
         font: 'bold 60pt Arial',
         fill: '#fff',
         boundsAlignH: 'right',
@@ -162,9 +163,6 @@ function startLevel() {
     graphics.beginFill(0x888888);
     graphics.drawRect(200, 40, 400, 40);
     graphics.endFill();
-    
-    // Set the points
-    points[z] = 0;
     
     // Start the countdown timer
     timer.start();
@@ -359,6 +357,7 @@ function continueFlood() {
     }
 
     // If there are no more streets to flood stop and evaluate
+    point = 0;
     if (floodContinues === false) {
         spreadTimer.stop();
         for (x = 0; x < level.length; x += 1) {
@@ -366,10 +365,15 @@ function continueFlood() {
                 if (level[x][y] === 1) {
 
                     // Give points for every dry street
-                    points[z] += 1;
+                    point += 1;
 
                 }
             }
+        }
+        if (points[z]) {
+            points[z] = Math.max(points[z], point);
+        } else {
+            points[z] = point;
         }
 
         // Update the point counter
