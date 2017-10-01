@@ -23,6 +23,7 @@ var barricadeIcon;
 var pointCounter;
 var spreadTimer;
 var scorebar;
+var backButton;
 
 // Global constants
 var tileWidth = 40;
@@ -67,14 +68,20 @@ function selectLevel() {
     game.world.remove(streets);
     game.world.remove(water);
     game.world.remove(graphics);
-    game.world.remove(timer);
     game.world.remove(countdownTimer);
     game.world.remove(barricadeCounter);
     game.world.remove(barricadeIcon);
     game.world.remove(pointCounter);
-    game.world.remove(spreadTimer);
     game.world.remove(scorebar);
-    
+    if (backButton) {
+        backButton.destroy();
+    }
+    if (timer) {
+        timer.destroy();
+    }
+    if (spreadTimer) {
+        spreadTimer.destroy();
+    }
     // Buttons to start the levels
     levelButtons = game.add.group();
 
@@ -125,13 +132,13 @@ function startLevel() {
 
     // Hide the level selection buttons
     levelButtons.destroy();
-
+    
     // A simple header for our game
     graphics = game.add.graphics(0, 0);
     graphics.beginFill(0x000000);
     graphics.drawRect(0, 0, 800, 120);
     graphics.endFill();
- 
+    
     // A timer to count the seconds before the flood
     timer = game.time.create(false);
     lastAction = 0;
@@ -158,6 +165,9 @@ function startLevel() {
     // Display a barricade icon next to the barricade counter
     barricadeIcon = game.add.image(700, 40, 'tileset', 18);
 
+    // Display the back button
+    backButton = game.add.button(740, 0, 'tileset', selectLevel, this, 111, 110);
+    
     // Display the points
     graphics.beginFill(0x000000);
     graphics.drawCircle(740, 540, 200);
@@ -461,7 +471,4 @@ function evaluate() {
     if (points[z] > 0) {
         maxLevel = z + 1;
     }
-
-    // Back to level selection screen button
-    scorebar.add(game.add.button(740, 0, 'tileset', selectLevel, this, 111, 110));
 }
