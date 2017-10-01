@@ -33,14 +33,15 @@ var startTime = 6;
 // Global variables
 var x;
 var y;
+var z;
 var tileX;
 var tileY;
-var currentLevel = 0;
 var maxLevel = 0;
 
 // Level specific variables
 var points = [];
 var barricades;
+var level;
 var floodContinues;
 
 function create() {
@@ -106,7 +107,7 @@ function startLevel() {
     game.world.remove(levelButtons);
 
     // Set the current level based on the clicked level button
-    currentLevel = arguments[0].data;
+    z = arguments[0].data;
 
     // A simple header for our game
     graphics = game.add.graphics(0, 0);
@@ -163,7 +164,7 @@ function startLevel() {
     graphics.endFill();
     
     // Set the points
-    points[currentLevel] = 0;
+    points[z] = 0;
     
     // Start the countdown timer
     timer.start();
@@ -178,8 +179,10 @@ function startLevel() {
     water = game.add.group();
 
     // Build all the assets of the current level data
-    for (x = 0; x < levels[currentLevel].length; x += 1) {
-        for (y = 0; y < levels[currentLevel][0].length; y += 1) {
+    level = [];
+    for (x = 0; x < levels[z].length; x += 1) {
+        level[x] = [];
+        for (y = 0; y < levels[z][0].length; y += 1) {
             
             // The x position of the current tile
             tileX = cityX + x * tileWidth;
@@ -187,7 +190,7 @@ function startLevel() {
             // The y position of the current tile
             tileY = cityY + y * tileHeight;
             
-            if (!levels[currentLevel][x][y]) {
+            if (!levels[z][x][y]) {
 
                 // Build a building
                 buildings.create(tileX, tileY, 'tileset', 0)
@@ -202,6 +205,9 @@ function startLevel() {
                 // Build an intersection on every other tile
                 streets.add(game.add.image(tileX, tileY, 'tileset', 1));
             }
+
+            // Save the current level data to use for barricades and flood
+            level[x][y] = levels[z][x][y];
         }
     }    
 }
@@ -224,7 +230,7 @@ function buildBarricade() {
     
     // Build a barricade on the selected street
     buildings.create(arguments[0].x, arguments[0].y, 'tileset', 18);
-    levels[currentLevel][(arguments[0].x - cityX) / 40][(arguments[0].y - cityY) / 40] = 2;
+    level[(arguments[0].x - cityX) / 40][(arguments[0].y - cityY) / 40] = 2;
     
     // Make sure that the barricades will be displayed on top of the street
     game.world.bringToTop(buildings);
@@ -249,7 +255,7 @@ function startFlood() {
     timer.stop();
 
     // Set water sources in every intersections of the edge of the level
-    for (x = 0; x < levels[currentLevel].length; x += 2) {
+    for (x = 0; x < level.length; x += 2) {
 
         // The x position of the current tile
         tileX = cityX + x * tileWidth;
@@ -258,19 +264,19 @@ function startFlood() {
         tileY = cityY;
 
         // Set the top border
-        levels[currentLevel][x][0] = 3;
+        level[x][0] = 3;
         
         // Fill the current position with water
         water.create(tileX, tileY, 'tileset', 19)
 
         // Set the bottom border
-        levels[currentLevel][x][levels[currentLevel].length - 1] = 3;
+        level[x][level.length - 1] = 3;
 
         // Fill the current position with water
-        water.create(tileX, tileY + (levels[currentLevel].length - 1) * tileHeight, 'tileset', 19)
+        water.create(tileX, tileY + (level.length - 1) * tileHeight, 'tileset', 19)
 
     }
-    for (y = 2; y < levels[currentLevel][0].length - 2; y += 2) {
+    for (y = 2; y < level[0].length - 2; y += 2) {
 
         // The x position of the current tile
         tileX = cityX;
@@ -279,16 +285,16 @@ function startFlood() {
         tileY = cityY + y * tileHeight;
         
         // Set the left border
-        levels[currentLevel][0][y] = 3;
+        level[0][y] = 3;
 
         // Fill the current position with water
         water.create(tileX, tileY, 'tileset', 19)
 
         // Set the right border
-        levels[currentLevel][levels[currentLevel][0].length - 1][y] = 3;
+        level[level[0].length - 1][y] = 3;
 
         // Fill the current position with water
-        water.create(tileX + (levels[currentLevel][0].length - 1) * tileWidth, tileY, 'tileset', 19)
+        water.create(tileX + (level[0].length - 1) * tileWidth, tileY, 'tileset', 19)
     }
 
     // Make sure that the water will be displayed on top of the street
@@ -302,11 +308,11 @@ function startFlood() {
 function continueFlood() {
 
     // Spread the water
-    for (x = 0; x < levels[currentLevel].length; x += 1) {
-        for (y = 0; y < levels[currentLevel][0].length; y += 1) {
+    for (x = 0; x < level.length; x += 1) {
+        for (y = 0; y < level[0].length; y += 1) {
 
             // Find the neighbors of the flooded areas
-            if (levels[currentLevel][x][y] === 3) {
+            if (level[x][y] === 3) {
 
                 // The x position of the current tile
                 tileX = cityX + x * tileWidth;
@@ -315,26 +321,26 @@ function continueFlood() {
                 tileY = cityY + y * tileHeight;
 
                 // Flood the left neighbor if possible
-                if (levels[currentLevel][x + 1] && levels[currentLevel][x + 1][y] === 1) {
-                    levels[currentLevel][x + 1][y] = 4;
+                if (level[x + 1] && level[x + 1][y] === 1) {
+                    level[x + 1][y] = 4;
                     water.create(tileX + tileWidth, tileY, 'tileset', 19)
                 }
                 
                 // Flood the right neighbor if possible
-                if (levels[currentLevel][x - 1] && levels[currentLevel][x - 1][y] === 1) {
-                    levels[currentLevel][x - 1][y] = 4;
+                if (level[x - 1] && level[x - 1][y] === 1) {
+                    level[x - 1][y] = 4;
                     water.create(tileX - tileWidth, tileY, 'tileset', 19)
                 }
                 
                 // Flood the top neighbor if possible
-                if (levels[currentLevel][x][y + 1] && levels[currentLevel][x][y + 1] === 1) {
-                    levels[currentLevel][x][y + 1] = 4;
+                if (level[x][y + 1] && level[x][y + 1] === 1) {
+                    level[x][y + 1] = 4;
                     water.create(tileX, tileY + tileHeight, 'tileset', 19)
                 }
                 
                 // Flood the bottom neighbor if possible
-                if (levels[currentLevel][x][y - 1] && levels[currentLevel][x][y - 1] === 1) {
-                    levels[currentLevel][x][y - 1] = 4;
+                if (level[x][y - 1] && level[x][y - 1] === 1) {
+                    level[x][y - 1] = 4;
                     water.create(tileX, tileY - tileHeight, 'tileset', 19)
                 }
             }
@@ -343,10 +349,10 @@ function continueFlood() {
 
     // Set the newly spreaded water
     floodContinues = false;
-    for (x = 0; x < levels[currentLevel].length; x += 1) {
-        for (y = 0; y < levels[currentLevel][0].length; y += 1) {
-            if (levels[currentLevel][x][y] === 4) {
-                levels[currentLevel][x][y] = 3;
+    for (x = 0; x < level.length; x += 1) {
+        for (y = 0; y < level[0].length; y += 1) {
+            if (level[x][y] === 4) {
+                level[x][y] = 3;
                 floodContinues = true;
             }
         }
@@ -355,22 +361,22 @@ function continueFlood() {
     // If there are no more streets to flood stop and evaluate
     if (floodContinues === false) {
         spreadTimer.stop();
-        for (x = 0; x < levels[currentLevel].length; x += 1) {
-            for (y = 0; y < levels[currentLevel][0].length; y += 1) {
-                if (levels[currentLevel][x][y] === 1) {
+        for (x = 0; x < level.length; x += 1) {
+            for (y = 0; y < level[0].length; y += 1) {
+                if (level[x][y] === 1) {
 
                     // Give points for every dry street
-                    points[currentLevel] += 1;
+                    points[z] += 1;
 
                 }
             }
         }
 
         // Update the point counter
-        pointCounter.text = points[currentLevel];
+        pointCounter.text = points[z];
 
-        if (points[currentLevel] > 0) {
-            maxLevel = currentLevel + 1;
+        if (points[z] > 0) {
+            maxLevel = z + 1;
         }
         game.world.remove(buildings);
         game.world.remove(streets);
