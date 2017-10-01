@@ -236,8 +236,6 @@ function startFlood() {
 
 function continueFlood() {
 
-    console.log('flooding' + currentLevel);
-
     // Spread the water
     for (x = 0; x < levels[currentLevel].length; x += 1) {
         for (y = 0; y < levels[currentLevel][0].length; y += 1) {
