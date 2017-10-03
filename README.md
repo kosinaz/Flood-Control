@@ -1,4 +1,29 @@
 # Flood Control
+
+*The Apocalypse is upon us, and it will get our feet wet.*
+
+A real-time puzzle game, in which your goal is to save certain areas of the city from the endless flood by placing wall to wall barricades on the streets.
+
+You have **6 seconds** to place down **4 barricades** by clicking on the streets **between 2 buildings** and make a completely sealed down area that cannot be reached by the flooding water after the time is up.
+
+You will get:
+* 10 points for every dry street
+* 2 points for every unused barricade
+* 1 point for every unused second after your last barricade placement
+
+You have to collect at least **30 points to unlock the next level**!
+
+You have to prove your skills through **15 levels**:
+* 5 7*7 levels
+* 5 9*9 levels
+* 5 11*11 levels
+
+Be quick, be efficient, and control the flood!
+
+Made for #dreamhackjam in under 72 hours.
+
+Future plans:
+
 Good bye, Mr. Sun!
 
 You have to keep your positive attitude, even on the brink of Apocalypse! So let's get this party flooded!
