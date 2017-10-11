@@ -2,7 +2,8 @@ var loadState = {
     preload: function () {
 
         // Load the tileset
-        game.load.spritesheet('tileset', 'assets/tileset.png', 96, 72);
+        game.load.spritesheet('tiles', 'assets/tiles.png', 96, 83);
+        game.load.spritesheet('blocks', 'assets/blocks.png', 96, 96);
 
         // Load the UI elements
         game.load.spritesheet('ui', 'assets/ui.png', 40, 40);

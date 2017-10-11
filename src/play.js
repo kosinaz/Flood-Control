@@ -166,13 +166,13 @@ var playState = {
                 if (!level[x][y]) {
 
                     // Build a building
-                    this.levelImage[x][y] = game.add.image(point.x, point.y, 'tileset', 0);
+                    this.levelImage[x][y] = game.add.image(point.x, point.y - 83 / 6, 'blocks', game.rnd.integerInRange(0, 11));
 
                 } else if (x % 2 || y % 2) {
 
                     // Build a street suitable for a barricade on every second tile
-                    this.levelImage[x][y] = game.add.image(point.x, point.y, 'tileset', 1);
-                    street = game.add.button(point.x, point.y, 'tileset', this.buildBarricade, this, 3, 6);
+                    this.levelImage[x][y] = game.add.image(point.x, point.y, 'tiles', 1);
+                    street = game.add.button(point.x, point.y, 'tiles', this.buildBarricade, this, 3, 4);
                     streets.add(street);
                     
                     // Add the original position of the barricade to the button
@@ -185,7 +185,7 @@ var playState = {
                 } else {
 
                     // Build an intersection on every other tile
-                    this.levelImage[x][y] = game.add.image(point.x, point.y, 'tileset', 1);
+                    this.levelImage[x][y] = game.add.image(point.x, point.y, 'tiles', 1);
                 }
             }
         }
@@ -218,7 +218,7 @@ var playState = {
     toIsometric: function (x, y) {
        return {
            x: (x - y) * 48 + 340,
-           y: (x + y) * 24 + 120
+           y: (x + y) * 83 / 3 + 120
        }
     }
 };
