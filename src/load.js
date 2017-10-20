@@ -11,6 +11,9 @@ var loadState = {
 
         // Load the level data
         game.load.json('levels', 'data/levels.json');
+
+        // Load music
+        game.load.audio('music', 'assets/Revolutionary.mp3');
     },
     create: function () {
 
@@ -19,5 +22,9 @@ var loadState = {
 
         // Start the main menu
         game.state.start('menu');
+
+        // Start music
+        music = game.add.audio('music', 0.3, true);
+        music.play();
     }
 };
