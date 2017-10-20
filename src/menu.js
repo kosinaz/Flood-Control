@@ -1,8 +1,16 @@
 var menuState = {
     create: function () {
 
+        // Create waves
+        game.waves = game.add.group();
+        for (var i = 0; i < 18; i += 1) {
+            game.wave = game.waves.create(i * 60 + 340, i * 30 - 230, 'wave');
+            game.wave.animations.add('move');
+            game.wave.animations.play('move', 60, true);
+        }
+ 
         // Set the background color
-        game.stage.backgroundColor = "#00f";
+        game.stage.backgroundColor = "#1caeff";
         
         // Create a button for each level
         game.levels.forEach(function (level, i) {
@@ -68,4 +76,8 @@ var menuState = {
                 boundsAlignV: 'middle'
             });
     },
+    update: function () {
+        game.waves.setAll('x', 4, '', '', 2);
+        game.waves.setAll('y', 2, '', '', 1);
+    }
 };
