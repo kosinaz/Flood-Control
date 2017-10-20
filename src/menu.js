@@ -6,7 +6,7 @@ var menuState = {
         for (var i = 0; i < 18; i += 1) {
             game.wave = game.waves.create(i * 60 + 340, i * 30 - 230, 'wave');
             game.wave.animations.add('move');
-            game.wave.animations.play('move', 60, true);
+            game.wave.animations.play('move', 120, true);
         }
  
         // Set the background color
@@ -77,7 +77,7 @@ var menuState = {
             });
     },
     update: function () {
-        game.waves.setAll('x', 4, '', '', 2);
-        game.waves.setAll('y', 2, '', '', 1);
+        game.waves.setAll('x', 1, '', '', 2);
+        game.waves.setAll('y', 0.5, '', '', 1);
     }
 };
