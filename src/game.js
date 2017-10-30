@@ -1,5 +1,5 @@
-// Create the game with a 800*600 screen size
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '');
+// Create the game with a 1024*576 screen size
+var game = new Phaser.Game(1024, 576, Phaser.AUTO, '');
 
 // Create and open the loading screen
 game.state.add('load', loadState, true);

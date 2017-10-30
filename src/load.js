@@ -4,6 +4,7 @@ var loadState = {
         // Load the tileset
         game.load.spritesheet('tiles', 'assets/tiles.png', 96, 83);
         game.load.spritesheet('blocks', 'assets/blocks.png', 96, 96);
+        game.load.spritesheet('tileset', 'assets/tileset.png', 96, 96);
         game.load.atlasJSONHash('wave', 'assets/waveanimation.png', 'data/waveanimation.json');
 
         // Load the UI elements
@@ -11,6 +12,7 @@ var loadState = {
 
         // Load the level data
         game.load.json('levels', 'data/levels.json');
+        game.load.json('level', 'data/mapstart.json');
 
         // Load music
         game.load.audio('music', 'assets/Revolutionary.mp3');
@@ -19,6 +21,7 @@ var loadState = {
 
         // Store the levels
         game.levels = game.cache.getJSON('levels');
+        game.level = game.cache.getJSON('level').layers;
 
         // Start the main menu
         game.state.start('menu');

@@ -20,7 +20,7 @@ var playState = {
 
     create: function () {
 
-        var delay = 6000;
+        var delay = 60000;
 
         // Set the number of buildable barricades
         game.barricades = 4;
@@ -125,9 +125,24 @@ var playState = {
 
         // Update the countdown timer
         countdownTimer.text = '0:0' + Math.ceil(timer.duration / 1000);
+        
+        if (game.upKey.isDown) {
+            game.player.x += 2;            
+            game.player.y += -1;            
+        } else if (game.downKey.isDown) {
+            game.player.x += -2;
+            game.player.y += 1;
+        }
+        
+        if (game.leftKey.isDown) {
+            game.player.x += -2;
+            game.player.y += -1;
+        } else if (game.rightKey.isDown) {
+            game.player.x += 2;
+            game.player.y += 1;
+        }
+        game.layer1.sort('y', Phaser.Group.SORT_ASCENDING);
 
-        // Update the barricade counter
-        barricadeCounter.text = game.barricades;
 
     },
 
@@ -141,54 +156,68 @@ var playState = {
             fill: '#fff'
         });
 
-        // Set the barricade counter
-        game.add.image(150, 40, 'tileset', 18);
-        barricadeCounter = game.add.text(200, 40, '0', {
-            font: 'bold 30pt Arial',
-            fill: '#fff'
-        })
-
         // Create the back button
         game.add.button(720, 40, 'ui', function () {
             game.state.start('menu');
         }, this, 111, 110);
 
+        game.layer0 = game.add.group();
+        game.layer1 = game.add.group();
         // Create the map
-        streets = game.add.group()
-        for (x = 0; x < level.length; x += 1) {
+        for (x = 0; x < 23; x += 1) {
             this.levelImage[x] = [];
-            for (y = 0; y < level.length; y += 1) {
+            for (y = 0; y < 23; y += 1) {
 
                 // The position of the current tile
                 point = this.toIsometric(x, y);
 
-                // Build a tile                
-                if (!level[x][y]) {
-
-                    // Build a building
-                    this.levelImage[x][y] = game.add.image(point.x, point.y - 83 / 6, 'blocks', game.rnd.integerInRange(0, 11));
-
-                } else if (x % 2 || y % 2) {
-
-                    // Build a street suitable for a barricade on every second tile
-                    this.levelImage[x][y] = game.add.image(point.x, point.y, 'tiles', 1);
-                    street = game.add.button(point.x, point.y, 'tiles', this.buildBarricade, this, 3, 4);
-                    streets.add(street);
+                // Build the flooded areas       
+                
+                if (game.level[0].data[x + y * 23] > 68) {
                     
-                    // Add the original position of the barricade to the button
-                    street.data = {
-                        x: x,
-                        y: y
-                    }
-                    game.world.bringToTop(streets);
+                    // Build and color the walls
+                    game.add.image(point.x, point.y, 'tileset', game.level[0].data[x + y * 23], game.layer0).tint = Phaser.Color.getRandomColor(0, 127);
 
-                } else {
+                    // Build and color the roof
+                    game.add.image(point.x, point.y, 'tileset', game.level[0].data[x + y * 23] + 1, game.layer0).tint = Phaser.Color.getRandomColor(0, 127);
 
-                    // Build an intersection on every other tile
-                    this.levelImage[x][y] = game.add.image(point.x, point.y, 'tiles', 1);
+                    // Add the eyes and windows
+                    game.add.image(point.x, point.y, 'tileset', game.level[0].data[x + y * 23] + 2, game.layer0);  
+                    
+                } else if (game.level[0].data[x + y * 23] > 0) {
+
+                    // Build a street
+                    game.add.image(point.x, point.y, 'tileset', game.level[0].data[x + y * 23] - 1, game.layer0);
+                    
                 }
+
+                // Build a building               
+                if (game.level[1].data[x + y * 23] > 0) {
+ 
+                    
+                    // Build and color the walls
+                    game.add.image(point.x, point.y, 'tileset', game.level[1].data[x + y * 23], game.layer1).tint = Phaser.Color.getRandomColor(127, 255);
+
+                     // Build and color the roof
+                    game.add.image(point.x, point.y, 'tileset', game.level[1].data[x + y * 23] + 1, game.layer1).tint = Phaser.Color.getRandomColor(0, 255);
+
+                    // Add the eyes and windows
+                    game.add.image(point.x, point.y, 'tileset', game.level[1].data[x + y * 23] + 2, game.layer1);  
+
+                }                    
             }
         }
+
+        point = this.toIsometric(10, 10);
+        game.player = game.add.sprite(point.x, point.y, 'tileset', 32, game.layer1);
+        game.player.iz = y;
+
+        // Set up our controls.
+        game.upKey = game.input.keyboard.addKey(Phaser.Keyboard.UP);
+        game.downKey = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+        game.leftKey = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+        game.rightKey = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+
     },
 
     buildBarricade: function () {
@@ -217,8 +246,8 @@ var playState = {
 
     toIsometric: function (x, y) {
        return {
-           x: (x - y) * 48 + 340,
-           y: (x + y) * 83 / 3 + 120
+           x: (x - y) * 48 + 468,
+           y: (x + y) * 24 - 300
        }
     }
 };
