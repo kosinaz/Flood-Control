@@ -2,90 +2,118 @@ var playState = {
 
     create: function () {
 
-        // Build the UI
-        this.buildUI();
+        this.drawLevel();
+        this.initPlayer();
     },
 
-    update: function () {
+    drawLevel: function () {
 
-        game.layer1.sort('y', Phaser.Group.SORT_ASCENDING);
+        // Set the level
+        game.level = game.cache.getJSON('level');
+
+        // Draw each tile of the first layer of the level and group them
+        game.level.layers[0].data.forEach(this.drawTile, {
+            layer: game.add.group(),
+            toIso: this.toIso, 
+            width: game.level.layers[0].width
+        });
+        
+        // Draw each tile of the second layer of the level and group them
+        game.level.layers[1].data.forEach(this.drawTile, {
+            layer: game.actors = game.add.group(),
+            toIso: this.toIso, 
+            width: game.level.layers[1].width
+        });
+    },
+
+    drawTile: function (tile, i) {
+        
+        // Translate the tile map into 2 dimensions
+        var x = i % this.width, y = Math.floor(i / this.width);
+
+        // Draw the tile at the isometric counterpart of its specified position
+        game.add.image(
+            this.toIso(x, y).x,
+            this.toIso(x, y).y, 
+            'tileset', 
+            tile - 1, 
+            this.layer
+        );
+    },
     
+    toIso: function (x, y) {
+        
+        // Translate the coordinates into isometric with an offset
+        return {
+            x: (x - y) * 48 + 468,
+            y: (x + y) * 24 - 300
+        }
     },
 
-    buildUI: function () {
+    initPlayer: function () {
 
-        game.layer0 = game.add.group();
-        game.layer1 = game.add.group();
-        // Create the map
-        for (x = 0; x < 23; x += 1) {
-            for (y = 0; y < 23; y += 1) {
+        // Add the player
+        game.player = game.add.sprite(
+            this.toIso(10, 10).x, 
+            this.toIso(10, 10).y, 
+            'tileset', 32, 
+            game.actors
+        );
 
-                // The position of the current tile
-                point = this.toIsometric(x, y);
+        // Set the move up button
+        game.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(
+            this.move, 
+            this, 
+            0, 
+            96, 
+            -48
+        );
 
-                // Build the flooded areas       
-                
-                if (game.level[0].data[x + y * 23] > 68) {
-                    
-                    // Build and color the walls
-                    game.add.image(point.x, point.y, 'tileset', game.level[0].data[x + y * 23], game.layer0).tint = Phaser.Color.getRandomColor(0, 127);
-
-                    // Build and color the roof
-                    game.add.image(point.x, point.y, 'tileset', game.level[0].data[x + y * 23] + 1, game.layer0).tint = Phaser.Color.getRandomColor(0, 127);
-
-                    // Add the eyes and windows
-                    game.add.image(point.x, point.y, 'tileset', game.level[0].data[x + y * 23] + 2, game.layer0);  
-                    
-                } else if (game.level[0].data[x + y * 23] > 0) {
-
-                    // Build a street or intersection
-                    game.add.image(point.x, point.y, 'tileset', game.level[0].data[x + y * 23] - 1, game.layer0);
-                                       
-                }
-
-                // Build a building               
-                if (game.level[1].data[x + y * 23] > 0) {
- 
-                    
-                    // Build and color the walls
-                    game.add.image(point.x, point.y, 'tileset', game.level[1].data[x + y * 23], game.layer1).tint = Phaser.Color.getRandomColor(127, 255);
-
-                     // Build and color the roof
-                    game.add.image(point.x, point.y, 'tileset', game.level[1].data[x + y * 23] + 1, game.layer1).tint = Phaser.Color.getRandomColor(0, 255);
-
-                    // Add the eyes and windows
-                    game.add.image(point.x, point.y, 'tileset', game.level[1].data[x + y * 23] + 2, game.layer1);  
-
-                }                    
-            }
-        }
-
-        point = this.toIsometric(10, 10);
-        game.player = game.add.sprite(point.x, point.y, 'tileset', 32, game.layer1);
-        game.player.tween = {};
-
-        // Set up our controls.
-        game.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(this.move, this, 0, 96, -48);
-        game.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(this.move, this, 0, -96, 48);
-        game.input.keyboard.addKey(Phaser.Keyboard.LEFT).onDown.add(this.move, this, 0, -96, -48);
-        game.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(this.move, this, 0, 96, 48);
-     
+        // Set the move down button
+        game.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(
+            this.move, 
+            this, 
+            0, 
+            -96, 
+            48
+        );
+        
+        // Set the move left button
+        game.input.keyboard.addKey(Phaser.Keyboard.LEFT).onDown.add(
+            this.move, 
+            this, 
+            0, 
+            -96, 
+            -48
+        );
+        
+        // Set the move right button
+        game.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(
+            this.move, 
+            this, 
+            0, 
+            96, 
+            48
+        );
     },
 
     move: function () {
+
+        // If the player is already moving ignore the input
         if (game.tweens.isTweening(game.player)) {
             return;
         }
+
+        // Move the player to the specified direction
         game.add.tween(game.player).to({
             x: game.player.x + arguments[1], 
             y: game.player.y + arguments[2]
         }, 300, Phaser.Easing.Cubic.InOut, true);
     },
 
-    toIsometric: function (x, y) {
-       return {
-           x: (x - y) * 48 + 468,
-           y: (x + y) * 24 - 300
-       }
+    update: function () {
+
+        // Draw the overlapping actors in the correct order
+        game.actors.sort('y', Phaser.Group.SORT_ASCENDING);
     }
 };
