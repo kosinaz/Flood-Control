@@ -1,13 +1,5 @@
 var menuState = {
     create: function () {
-
-        // Create waves
-        game.waves = game.add.group();
-        for (var i = 0; i < 18; i += 1) {
-            game.wave = game.waves.create(i * 60 + 340, i * 30 - 230, 'wave');
-            game.wave.animations.add('move');
-            game.wave.animations.play('move', 120, true);
-        }
  
         // Set the background color
         game.stage.backgroundColor = "#1caeff";
@@ -75,9 +67,5 @@ var menuState = {
                 boundsAlignH: 'right',
                 boundsAlignV: 'middle'
             });
-    },
-    update: function () {
-        game.waves.setAll('x', 1, '', '', 2);
-        game.waves.setAll('y', 0.5, '', '', 1);
     }
 };

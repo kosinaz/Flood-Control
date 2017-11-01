@@ -2,16 +2,9 @@ var loadState = {
     preload: function () {
 
         // Load the tileset
-        game.load.spritesheet('tiles', 'assets/tiles.png', 96, 83);
-        game.load.spritesheet('blocks', 'assets/blocks.png', 96, 96);
         game.load.spritesheet('tileset', 'assets/tileset.png', 96, 96);
-        game.load.atlasJSONHash('wave', 'assets/waveanimation.png', 'data/waveanimation.json');
-
-        // Load the UI elements
-        game.load.spritesheet('ui', 'assets/ui.png', 40, 40);
 
         // Load the level data
-        game.load.json('levels', 'data/levels.json');
         game.load.json('level', 'data/mapstart.json');
 
         // Load music
@@ -24,7 +17,7 @@ var loadState = {
         game.level = game.cache.getJSON('level').layers;
 
         // Start the main menu
-        game.state.start('menu');
+        game.state.start('play');
 
         // Start music
         music = game.add.audio('music', 0.3, true);
