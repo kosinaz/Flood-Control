@@ -2,13 +2,6 @@ var playState = {
 
     create: function () {
 
-        this.drawLevel();
-        this.setControls();
-        //this.initBarriers();
-    },
-
-    drawLevel: function () {
-
         // Set the level
         game.level = game.cache.getJSON('level');
         game.barriers = [];
@@ -33,7 +26,7 @@ var playState = {
             group: game.actors,
             toIso: this.toIso, 
             width: game.level.layers[2].width
-        });
+        });    
     },
 
     drawTile: function (tile, i) {
@@ -103,56 +96,12 @@ var playState = {
         }
     },
 
-    setControls: function () {
-
-        // Set the move up button
-        game.input.keyboard.addKey(Phaser.Keyboard.UP).onDown.add(
-            this.movePlayer, 
-            this, 
-            0, 
-            0, 
-            -1,
-            38
-        );
-
-        // Set the move down button
-        game.input.keyboard.addKey(Phaser.Keyboard.DOWN).onDown.add(
-            this.movePlayer, 
-            this, 
-            0, 
-            0, 
-            1,
-            36
-        );
-        
-        // Set the move left button
-        game.input.keyboard.addKey(Phaser.Keyboard.LEFT).onDown.add(
-            this.movePlayer, 
-            this, 
-            0, 
-            -1, 
-            0,
-            39
-        );
-        
-        // Set the move right button
-        game.input.keyboard.addKey(Phaser.Keyboard.RIGHT).onDown.add(
-            this.movePlayer, 
-            this, 
-            0, 
-            1, 
-            0,
-            37
-        );
-    },
-
-    movePlayer: function () {
+    movePlayer: function (xd, yd, tile) {
 
         // Determine the path of the player 
-        var 
-            i,
-            x = game.player.x + arguments[1],
-            y = game.player.y + arguments[2];
+        var i;
+        x = game.player.x + xd;
+        y = game.player.y + yd;
 
         // If the player is already moving ignore the input
         if (game.tweens.isTweening(game.player.sprite)) {
@@ -160,44 +109,45 @@ var playState = {
         }
 
         // If there is a building in the way ignore the input
-        if (game.level.layers[1].data[x + y * 23] !== 1) {
+        if (game.level.layers[1].data[x + y * 23]) {
             return false;
         }
-
+        
         // If there is a barrier in the way push the barrier
         for (i = 0; i < game.barriers.length; i += 1) {
             if (x === game.barriers[i].x && y === game.barriers[i].y) {
-                if(!this.moveBarrier(i, arguments[1], arguments[2])) {
+                if(!this.moveBarrier(i, xd, yd)) {
                     return false;
                 }
             }
-        }       
-
+        }    
+    
         // Move the player to the specified position
         game.player.x = x;
         game.player.y = y;
-
+        
         // Face the sprite to the specified direction
-        game.player.sprite.frame = arguments[3];
-
+        game.player.sprite.frame = tile;
+        
         // Move the sprite of the player to the specified position
         game.add.tween(game.player.sprite).to({
             x: this.toIso(x, y).x, 
             y: this.toIso(x, y).y
-        }, 200, Phaser.Easing.Cubic.InOut, true);
-
+        }, 200, Phaser.Easing.None, true);
+        
         return true;
     },
 
-    moveBarrier: function (i, x, y) {
-        // Determine the path of the barrier 
-        var 
-            j,
-            x = game.barriers[i].x + arguments[1],
-            y = game.barriers[i].y + arguments[2];
-
+    moveBarrier: function (i, xd, yd) {
+        
+    // Determine the path of the barrier 
+    var 
+        j,
+        x = game.barriers[i].x + xd,
+        y = game.barriers[i].y + yd;
+        
         // If there is a building in the way ignore the input
-        if (game.level.layers[1].data[x + y * 23] !== 1) {
+        if (game.level.layers[1].data[x + y * 23]) {
             return false;
         }
         
@@ -207,21 +157,43 @@ var playState = {
                 return false;
             }
         }   
-
+        
         // Move the barrier to the specified position
         game.barriers[i].x = x;
         game.barriers[i].y = y;
-
+        
         // Move the sprite of the barrier to the specified position
         game.add.tween(game.barriers[i].sprite).to({
             x: this.toIso(x, y).x, 
             y: this.toIso(x, y).y
-        }, 200, Phaser.Easing.Cubic.InOut, true);
-
+        }, 200, Phaser.Easing.None, true);
+        
         return true;
     },
 
     update: function () {
+
+        // Set the movement buttons
+        if (game.input.keyboard.isDown(Phaser.KeyCode.UP)) {
+
+            // Set the move up button
+            this.movePlayer(0, -1, 38);
+
+        } else if (game.input.keyboard.isDown(Phaser.KeyCode.DOWN)) {
+
+            // Set the move down button
+            this.movePlayer(0, 1, 36);
+
+        } else if (game.input.keyboard.isDown(Phaser.KeyCode.LEFT)) {
+
+            // Set the move left button
+            this.movePlayer(-1, 0, 39);
+
+        } else if (game.input.keyboard.isDown(Phaser.KeyCode.RIGHT)) {
+
+            // Set the move right button
+            this.movePlayer(1, 0, 37);
+        }
 
         // Draw the overlapping actors in the correct order
         game.actors.sort('y', Phaser.Group.SORT_ASCENDING);
