@@ -32,21 +32,59 @@ var playState = {
     drawTile: function (tile, i) {
         
         // Translate the tile map into 2 dimensions
-        var x = i % this.width, y = Math.floor(i / this.width);
+        var x = i % this.width, y = Math.floor(i / this.width), color, tint;
         
         // If there is nothing to draw continue with the the next tile
         if (!tile) {
             return;
         }
         
-        // Draw the tile at the isometric counterpart of its specified position
-        game.add.image(
-            this.toIso(x, y).x,
-            this.toIso(x, y).y, 
-            'tileset', 
-            tile - 1, 
-            this.group
-        );
+        // If the tile is not a building draw it as is
+        if (tile < 65) {
+            
+            // Draw the tile at the isometric counterpart of its specified position
+            game.add.image(
+                this.toIso(x, y).x,
+                this.toIso(x, y).y, 
+                'tileset', 
+                tile - 1, 
+                this.group
+            );
+
+        // Else draw and color each part of the building
+        } else {
+
+            // Pick a random color hue
+            color = Phaser.Color.HSLtoRGB(Math.random(), 1, 0.5);
+
+            // Draw and color the wall
+            game.add.image(
+                this.toIso(x, y).x,
+                this.toIso(x, y).y, 
+                'tileset', 
+                tile, 
+                this.group
+            ).tint = Phaser.Color.createColor(color.r, color.g, color.b).color;
+
+            // Draw and color the roof with a different color
+            game.add.image(
+                this.toIso(x, y).x,
+                this.toIso(x, y).y, 
+                'tileset', 
+                tile + 1, 
+                this.group
+            ).tint = Phaser.Color.createColor(color.g, color.b, color.r).color;
+
+            // Draw the rest
+            game.add.image(
+                this.toIso(x, y).x,
+                this.toIso(x, y).y, 
+                'tileset', 
+                tile + 2, 
+                this.group
+            );
+
+        }
     },
     
     toIso: function (x, y) {
