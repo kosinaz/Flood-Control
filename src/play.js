@@ -40,7 +40,7 @@ var playState = {
         }
         
         // If the tile is not a building draw it as is
-        if (tile < 65) {
+        if (tile < 69) {
             
             // Draw the tile at the isometric counterpart of its specified position
             game.add.image(
