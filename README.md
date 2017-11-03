@@ -1,3 +1,5 @@
+![Flood Control Header](https://raw.githubusercontent.com/kosinaz/Flood-Control/master/misc/Header.png)
+
 # Flood Control
 
 *The Apocalypse is upon us, and it will get our feet wet.*
@@ -17,3 +19,5 @@ You have to prove your skills through several levels with increasing number of b
 Be quick, be efficient, and control the flood!
 
 Originally made for #dreamhackjam in under 72 hours.
+
+## [Play it now on GameJolt!](https://gamejolt.com/games/flood-control/287591)
