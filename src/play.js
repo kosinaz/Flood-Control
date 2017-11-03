@@ -6,6 +6,7 @@ var playState = {
         game.level = game.cache.getJSON('level');
         game.barriers = [];
         game.waves = [];
+        game.water = [];
 
         // Draw each tile of the first layer of the level and group them
         game.level.layers[0].data.forEach(this.drawTile, {
@@ -235,6 +236,22 @@ var playState = {
                 y: 0,
                 sprite: sprite
             });
+
+            // Draw the water behind the wave
+            sprite = game.add.sprite( 
+                this.toIso(x, -1).x,
+                this.toIso(x, -1).y, 
+                'tileset', 
+                60, 
+                game.actors
+            );
+
+            // Set the water behind the wave
+            game.water.push({
+                x: x,
+                y: -1,
+                sprite: sprite
+            });
         }
     },
 
@@ -262,9 +279,14 @@ var playState = {
             this.movePlayer(1, 0, 37);
         }
 
-        // If there is any wave on the level
+        // If there is any wave on the level move it
         if (game.waves.length) {
             game.waves.forEach(this.moveWave, this);
+        }
+
+        // If there is any water on the level move it
+        if (game.water.length) {
+            game.water.forEach(this.moveWater, this);
         }
 
         // Draw the overlapping actors in the correct order
@@ -299,6 +321,48 @@ var playState = {
         game.add.tween(wave.sprite).to({
             x: this.toIso(wave.x, wave.y).x, 
             y: this.toIso(wave.x, wave.y).y
+        }, 1000, Phaser.Easing.None, true);
+        
+        return true;
+    },
+
+    moveWater: function (water) {
+        
+        var i;
+
+        // If the water is already moving ignore the input
+        if (game.tweens.isTweening(water.sprite)) {
+            return false;
+        }
+
+        // If there is a building in the way ignore the input
+        if (game.level.layers[1].data[water.x + (water.y + 1) * game.level.layers[1].width] > 67) {
+            return false;
+        }
+        
+        // If there is a barrier in the way ignore the input
+        for (i = 0; i < game.barriers.length; i += 1) {
+            if (water.x === game.barriers[i].x && water.y + 1 === game.barriers[i].y) {
+                return false;
+            }
+        }    
+
+        // Leave a raised water behind
+        game.add.image(
+            this.toIso(water.x, water.y).x,
+            this.toIso(water.x, water.y).y, 
+            'tileset', 
+            60, 
+            game.actors
+        );
+    
+        // Move the water to the specified position
+        water.y += 1;
+        
+        // Move the sprite of the water to the specified position
+        game.add.tween(water.sprite).to({
+            x: this.toIso(water.x, water.y).x, 
+            y: this.toIso(water.x, water.y).y
         }, 1000, Phaser.Easing.None, true);
         
         return true;
