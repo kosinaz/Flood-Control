@@ -5,6 +5,7 @@ var playState = {
         // Set the level
         game.level = game.cache.getJSON('level');
         game.barriers = [];
+        game.waves = [];
 
         // Draw each tile of the first layer of the level and group them
         game.level.layers[0].data.forEach(this.drawTile, {
@@ -27,6 +28,9 @@ var playState = {
             toIso: this.toIso, 
             width: game.level.layers[2].width
         });    
+
+        // Delay the flood
+        game.time.events.add(Phaser.Timer.SECOND * 1, this.startFlood, this);
     },
 
     drawTile: function (tile, i) {
@@ -147,7 +151,7 @@ var playState = {
         }
 
         // If there is a building in the way ignore the input
-        if (game.level.layers[1].data[x + y * 23]) {
+        if (game.level.layers[1].data[x + y * game.level.layers[1].width]) {
             return false;
         }
         
@@ -185,7 +189,7 @@ var playState = {
         y = game.barriers[i].y + yd;
         
         // If there is a building in the way ignore the input
-        if (game.level.layers[1].data[x + y * 23]) {
+        if (game.level.layers[1].data[x + y * game.level.layers[1].width]) {
             return false;
         }
         
@@ -207,6 +211,31 @@ var playState = {
         }, 200, Phaser.Easing.None, true);
         
         return true;
+    },
+
+    startFlood: function () {
+
+        var x, sprite;
+
+        // Create a wave on each tile of the upper border of the level
+        for (x = 0; x < game.level.layers[1].width; x += 1) {
+
+            // Draw the wave
+            sprite = game.add.sprite( 
+                this.toIso(x, 0).x,
+                this.toIso(x, 0).y, 
+                'tileset', 
+                44, 
+                game.actors
+            );
+
+            // Set the wave
+            game.waves.push({
+                x: x,
+                y: 0,
+                sprite: sprite
+            });
+        }
     },
 
     update: function () {
@@ -233,7 +262,45 @@ var playState = {
             this.movePlayer(1, 0, 37);
         }
 
+        // If there is any wave on the level
+        if (game.waves.length) {
+            game.waves.forEach(this.moveWave, this);
+        }
+
         // Draw the overlapping actors in the correct order
         game.actors.sort('y', Phaser.Group.SORT_ASCENDING);
+    },
+
+    moveWave: function (wave) {
+
+        var i;
+
+        // If the wave is already moving ignore the input
+        if (game.tweens.isTweening(wave.sprite)) {
+            return false;
+        }
+
+        // If there is a building in the way ignore the input
+        if (game.level.layers[1].data[wave.x + (wave.y + 1) * game.level.layers[1].width] > 67) {
+            return false;
+        }
+        
+        // If there is a barrier in the way ignore the input
+        for (i = 0; i < game.barriers.length; i += 1) {
+            if (wave.x === game.barriers[i].x && wave.y + 1 === game.barriers[i].y) {
+                return false;
+            }
+        }    
+    
+        // Move the wave to the specified position
+        wave.y += 1;
+        
+        // Move the sprite of the wave to the specified position
+        game.add.tween(wave.sprite).to({
+            x: this.toIso(wave.x, wave.y).x, 
+            y: this.toIso(wave.x, wave.y).y
+        }, 1000, Phaser.Easing.None, true);
+        
+        return true;
     }
 };
