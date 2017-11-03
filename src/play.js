@@ -295,25 +295,35 @@ var playState = {
 
     moveWave: function (wave) {
 
-        var i;
+        // Determine the path options of the wave 
+        /* var 
+            i;
+            x1 = wave.x + xd,
+            y1 = wave.y + yd; */
 
-        // If the wave is already moving ignore the input
+        // If the wave is already moving leave it moving
         if (game.tweens.isTweening(wave.sprite)) {
             return false;
         }
 
-        // If there is a building in the way ignore the input
+        // If there is a building in front of the wave remove the wave after a short delay
         if (game.level.layers[1].data[wave.x + (wave.y + 1) * game.level.layers[1].width] > 67) {
+            game.time.events.add(Phaser.Timer.SECOND * 1, this.removeWave, {
+                wave: wave
+            });
             return false;
         }
         
-        // If there is a barrier in the way ignore the input
+        // If there is a barrier in the way remove the wave after a short delay
         for (i = 0; i < game.barriers.length; i += 1) {
             if (wave.x === game.barriers[i].x && wave.y + 1 === game.barriers[i].y) {
+                game.time.events.add(Phaser.Timer.SECOND * 1, this.removeWave, {
+                    wave: wave
+                });
                 return false;
             }
         }    
-    
+
         // Move the wave to the specified position
         wave.y += 1;
         
@@ -324,6 +334,10 @@ var playState = {
         }, 1000, Phaser.Easing.None, true);
         
         return true;
+    },
+
+    removeWave: function () {
+        this.wave.sprite.kill();
     },
 
     moveWater: function (water) {
