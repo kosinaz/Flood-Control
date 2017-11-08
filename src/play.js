@@ -24,7 +24,7 @@ var playState = {
         game.map.layers[1].data.forEach(this.drawScene, this);
 
         // Delay the flood
-        game.time.events.add(Phaser.Timer.SECOND * 1, this.startFlood, this);
+        game.time.events.add(Phaser.Timer.SECOND * 10, this.startFlood, this);
     },
 
     /**
@@ -32,14 +32,9 @@ var playState = {
      * The streets and the already flooded, inpassable areas of the city.
      */ 
     drawBackground: function (tile, i) {
-        
-        // If there is nothing to draw continue with the next tile
-        if (!tile) {
-            return;
-        }
          
         // Draw the tile at the isometric counterpart of its specified position
-        this.drawTile(tile - 1, i, game.background);
+        new Tile(this.iToX(i), this.iToY(i), tile - 1, game.background);
     },
 
     /** 
