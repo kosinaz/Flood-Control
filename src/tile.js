@@ -1,5 +1,5 @@
 /**
- * Tiles are the most basic components of the game map. The map basically is 
+ * Tiles are the most basic components of the game map. The map is basically a 
  * list of tiles, that are containing information about their position and
  * graphical representation. The position information is what makes tiles 
  * slightly more complex than the solution that for example Tiled provides, 
@@ -8,37 +8,55 @@
  * Semi-isometric layers are made of Phaser.Groups. Every Tile of a layer is in
  * the same Phaser.Group, and they are getting depth sorted after every update
  * to properly display them isometrically.
- * @param {number} [x=0] - The x coordinate of the tile object.
- * @param {number} [y=0] - The y coordinate of the tile object.
- * @param {number} [i=0] - The index of the tile's image within the tileset.
- * @param {Phaser.Group} [layer] - The layer of the tile to be displayed on.
+ * @param {number} x - The x coordinate of the tile object.
+ * @param {number} y - The y coordinate of the tile object.
+ * @param {number} i - The index of the tile's image within the tileset.
+ * @param {Phaser.Group} layer - The layer of the tile to be displayed on.
  */
 var Tile = function (x, y, i, layer) {
 
     /**
-     * @property {number} [x=0] - The x coordinate of the tile object.
+     * @property {number} x - The x coordinate of the tile object.
      */
-    this.x = x || 0;
+    this.x = x;
 
     /**
-     * @property {number} [y=0] - The y coordinate of the tile object.
+     * @property {number} y - The y coordinate of the tile object.
      */
-    this.y = y || 0;
+    this.y = y;
 
     /**
-     * @property {number} [i=0] - The index of the tile's image.
+     * @property {number} i - The index of the tile's image.
      */
-    this.i = i || 0;
+    this.i = i;
 
     /**
-     * @property {Phaser.Group} [layer] - The layer of the tile.
+     * @property {Phaser.Group} layer - The layer of the tile.
      */
     this.layer = layer;
 
     /**
+     * @property {Phaser.Image} image - The image of the tile.
+     */
+    this.image = this.addImage();
+}
+
+/**
+ * Adds the graphical representation of the tile to the game based on its own
+ * attributes.
+ */
+Tile.prototype.addImage = function () {
+
+    /**
      * Draw the isometric Tile and add to the specified layer.
      */
-    game.add.image(this.getIX(), this.getIY(), 'tileset', this.i, this.layer);
+    return game.add.image(
+        this.getIsometricX(), 
+        this.getIsometricY(), 
+        'tileset', 
+        this.i, 
+        this.layer
+    );
 }
 
 /** 
@@ -48,10 +66,10 @@ var Tile = function (x, y, i, layer) {
  * This function comes handy when a 2-dimensional position needs to be 
  * displayed in isometric 2-dimensions.
  */
-Tile.prototype.getIX = function () {
-    return (this.x - this.y) * game.map.tilewidth / 2 + 
-        game.map.tilewidth / 2 * game.map.width / 2 - 
-        game.map.tilewidth;
+Tile.prototype.getIsometricX = function () {
+    return (this.x - this.y) * game.tiledMap.tilewidth / 2 + 
+        game.tiledMap.tilewidth / 2 * game.tiledMap.width / 2 - 
+        game.tiledMap.tilewidth;
 }
 
 /** 
@@ -61,8 +79,17 @@ Tile.prototype.getIX = function () {
  * This function comes handy when a 2-dimensional position needs to be 
  * displayed in isometric 2-dimensions.
  */
-Tile.prototype.getIY = function () {
-    return (this.x + this.y) * game.map.tileheight / 2 - 
-        game.map.tileheight / 2 * game.map.height / 2 - 
-        game.map.tileheight / 2;
+Tile.prototype.getIsometricY = function () {
+    return (this.x + this.y) * game.tiledMap.tileheight / 2 - 
+        game.tiledMap.tileheight / 2 * game.tiledMap.height / 2 - 
+        game.tiledMap.tileheight / 2;
+}
+
+/**
+ * Returns true if the current tile is a street-type tile.
+ * This function comes handy when it needs to be decided if the tile is 
+ * passable by the player or not.
+ */
+Tile.prototype.isStreet = function () {
+    return this.i > 8 && this.i < 22;
 }

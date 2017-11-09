@@ -3,7 +3,7 @@ var playState = {
     create: function () {
 
         // Set the map
-        game.map = game.cache.getJSON('level');
+        game.tiledMap = game.cache.getJSON('level');
 
         // Group the background layer to display everything else above it
         game.background = game.add.group();
@@ -14,14 +14,16 @@ var playState = {
         // Store the barriers and refer to them later during movement
         game.barriers = [];
 
+        game.map = new Map();
+
         game.waves = [];
         game.water = [];
 
         // Draw each tile of the background
-        game.map.layers[0].data.forEach(this.drawBackground, this);
+        game.tiledMap.layers[0].data.forEach(this.drawBackground, this);
         
         // Draw each tile of the scene
-        game.map.layers[1].data.forEach(this.drawScene, this);
+        game.tiledMap.layers[1].data.forEach(this.drawScene, this);
 
         // Delay the flood
         game.time.events.add(Phaser.Timer.SECOND * 10, this.startFlood, this);
@@ -34,7 +36,11 @@ var playState = {
     drawBackground: function (tile, i) {
          
         // Draw the tile at the isometric counterpart of its specified position
-        new Tile(this.iToX(i), this.iToY(i), tile - 1, game.background);
+        game.map.setXY(
+            this.iToX(i), 
+            this.iToY(i),
+            new Tile(this.iToX(i), this.iToY(i), tile - 1, game.background)
+        );
     },
 
     /** 
@@ -42,9 +48,10 @@ var playState = {
      * map.
      * This function comes handy when a Tiled map, that stores the map data in
      * a 1-dimensional array, needs to be displayed in 2-dimensions.
+     * It is used in drawBackground and drawScene.
      */
     iToX: function (i) {
-        return i % game.map.width;
+        return i % game.tiledMap.width;
     },
 
     /** 
@@ -54,7 +61,7 @@ var playState = {
      * a 1-dimensional array, needs to be displayed in 2-dimensions.
      */
     iToY: function (i) {
-        return Math.floor(i / game.map.width);
+        return Math.floor(i / game.tiledMap.width);
     },
 
     /** 
@@ -63,7 +70,7 @@ var playState = {
      * map data in a 1-dimensional array, needs to be checked or updated.
      */
     XYToI: function (x, y) {
-        return x + y * game.map.width;
+        return x + y * game.tiledMap.width;
     },
 
      /** 
@@ -74,9 +81,9 @@ var playState = {
      * 2-dimensions.
      */
     iToIsoX: function (i) {
-        return ((i % game.map.width) - Math.floor(i / game.map.width)) * 
-            game.map.tilewidth / 2 + game.map.tilewidth / 2 * 
-            game.map.width / 2 - game.map.tilewidth / 2;
+        return ((i % game.tiledMap.width) - Math.floor(i / game.tiledMap.width)) * 
+            game.tiledMap.tilewidth / 2 + game.tiledMap.tilewidth / 2 * 
+            game.tiledMap.width / 2 - game.tiledMap.tilewidth / 2;
     },
 
     /** 
@@ -87,9 +94,9 @@ var playState = {
      * 2-dimensions.
      */
     iToIsoY: function (i) {
-        return ((i % game.map.width) + Math.floor(i / game.map.height)) * 
-            game.map.tileheight / 2 - game.map.tileheight / 2 * 
-            game.map.height / 2 + game.map.tileheight / 2;
+        return ((i % game.tiledMap.width) + Math.floor(i / game.tiledMap.height)) * 
+            game.tiledMap.tileheight / 2 - game.tiledMap.tileheight / 2 * 
+            game.tiledMap.height / 2 + game.tiledMap.tileheight / 2;
     },
 
     /** 
@@ -100,8 +107,8 @@ var playState = {
      * displayed in isometric 2-dimensions.
      */
     XYToIsoX: function (x, y) {
-        return (x - y) * game.map.tilewidth / 2 + game.map.tilewidth / 2 * 
-            game.map.width / 2 - game.map.tilewidth / 2;
+        return (x - y) * game.tiledMap.tilewidth / 2 + game.tiledMap.tilewidth / 2 * 
+            game.tiledMap.width / 2 - game.tiledMap.tilewidth / 2;
     },
 
     /** 
@@ -112,8 +119,8 @@ var playState = {
      * displayed in isometric 2-dimensions.
      */
     XYToIsoY: function (x, y) {
-        return (x + y) * game.map.tileheight / 2 - game.map.tileheight / 2 * 
-            game.map.height / 2 + game.map.tileheight / 2;
+        return (x + y) * game.tiledMap.tileheight / 2 - game.tiledMap.tileheight / 2 * 
+            game.tiledMap.height / 2 + game.tiledMap.tileheight / 2;
     },
 
     /**
@@ -223,10 +230,10 @@ var playState = {
         }
 
         // If there is no street in the way ignore the input
-        if (!this.isStreet(x, y)) {
+        if (!game.map.getXY(x, y).isStreet()) {
             return false;
         }
-        
+
         // If there is a barrier in the way push the barrier
         if(!this.moveBarrier(this.getBarrier(x, y), xd, yd)) {
             return false;
@@ -244,18 +251,6 @@ var playState = {
         
         return true;
     },
-
-    /**
-     * Returns true if a street-tile can be found in the specified position of
-     * the map.
-     * This comes handy when it should be decided if the tile is passable by 
-     * the player or not.
-     */
-    isStreet: function (x, y) {
-        return game.map.layers[0].data[this.XYToI(x, y)] > 8 &&
-            game.map.layers[0].data[this.XYToI(x, y)] < 22
-    },
-
 
     /**
      * Iterates through all the barriers and returns the index of the barrier 
@@ -295,7 +290,7 @@ var playState = {
         y = game.barriers[i].y + yd;
         
         // If there is no street in the way ignore the input
-        if (!this.isStreet(x, y)) {
+        if (!game.map.getXY(x, y).isStreet()) {
             return false;
         }
         
@@ -303,7 +298,7 @@ var playState = {
         if (this.getBarrier(x, y) !== -1) {
             return false;
         } 
-        
+
         // Update the position of the barrier and its image
         this.moveActor(game.barriers[i], x, y, 200);
         
@@ -336,10 +331,10 @@ var playState = {
     startFlood: function () {
 
         // Create a wave on each tile of the top of the map
-        for (var i = 0; i < game.map.width; i += 1) {
+        for (var i = 0; i < game.tiledMap.width; i += 1) {
 
             // Draw the wave
-            game.waves.push(this.drawWave(45, i + game.map.width, 0, 1));
+            game.waves.push(this.drawWave(45, i + game.tiledMap.width, 0, 1));
             
             // Draw the water behind the wave
             game.water.push(this.drawWave(61, i, 0, 1));
@@ -449,7 +444,7 @@ var playState = {
      * the wave or not.
      */
     blocks: function (x, y) {
-        return game.map.layers[1].data[this.XYToI(x, y)] > 67 ||
+        return game.tiledMap.layers[1].data[this.XYToI(x, y)] > 67 ||
             this.getBarrier(x, y) !== -1;
     },
 
