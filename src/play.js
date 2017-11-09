@@ -36,9 +36,10 @@ var playState = {
     drawBackground: function (tile, i) {
          
         // Draw the tile at the isometric counterpart of its specified position
-        game.map.setXY(
+        game.map.setXYZ(
             this.iToX(i), 
             this.iToY(i),
+            0,
             new Tile(this.iToX(i), this.iToY(i), tile - 1, game.background)
         );
     },
@@ -160,7 +161,14 @@ var playState = {
         if (tile > 68) { 
 
             // If the tile is a house draw and color it part by part
-            this.drawHouse(tile, i);
+            game.map.setXYZ(this.iToX(i), this.iToY(i), 1, new House(
+                this.iToX(i), 
+                this.iToY(i), 
+                tile, 
+                tile + 1, 
+                tile + 2, 
+                game.scene
+            ));
 
         } else if (tile === 37) {
 
@@ -230,7 +238,7 @@ var playState = {
         }
 
         // If there is no street in the way ignore the input
-        if (!game.map.getXY(x, y).isStreet()) {
+        if (!game.map.getXYZ(x, y, 0).isStreet()) {
             return false;
         }
 
@@ -290,7 +298,7 @@ var playState = {
         y = game.barriers[i].y + yd;
         
         // If there is no street in the way ignore the input
-        if (!game.map.getXY(x, y).isStreet()) {
+        if (!game.map.getXYZ(x, y, 0).isStreet()) {
             return false;
         }
         
