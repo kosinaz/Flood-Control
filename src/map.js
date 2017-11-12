@@ -36,5 +36,5 @@ Map.prototype.getXYZ = function (x, y, z) {
     /**
      * Get the data of the specified coordinate attribute of the map.
      */
-    return this.map[x + ',' + y + ',' + z];
+    return this.map[x + ',' + y + ',' + z] || new Tile();
 }

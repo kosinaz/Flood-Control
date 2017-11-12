@@ -21,7 +21,7 @@ var playState = {
 
         // Draw each tile of the background
         game.tiledMap.layers[0].data.forEach(this.drawBackground, this);
-        
+
         // Draw each tile of the scene
         game.tiledMap.layers[1].data.forEach(this.drawScene, this);
 
@@ -32,16 +32,11 @@ var playState = {
     /**
      * Draws all the elements of the map that won't be acted upon.
      * The streets and the already flooded, inpassable areas of the city.
-     */ 
+     */
     drawBackground: function (tile, i) {
-         
+
         // Draw the tile at the isometric counterpart of its specified position
-        game.map.setXYZ(
-            this.iToX(i), 
-            this.iToY(i),
-            0,
-            new Tile(this.iToX(i), this.iToY(i), tile - 1, game.background)
-        );
+        new Tile(this.iToX(i), this.iToY(i), 0, tile - 1);
     },
 
     /** 
@@ -74,16 +69,16 @@ var playState = {
         return x + y * game.tiledMap.width;
     },
 
-     /** 
-     * Translates a 1-dimensional index into an isometric x coordinate of a 
-     * 2-dimensional map and positions it to the middle of the screen.
-     * This function comes handy when an isometric Tiled map, that stores the 
-     * map data in a 1-dimensional array, needs to be displayed in isometric
-     * 2-dimensions.
-     */
+    /** 
+    * Translates a 1-dimensional index into an isometric x coordinate of a 
+    * 2-dimensional map and positions it to the middle of the screen.
+    * This function comes handy when an isometric Tiled map, that stores the 
+    * map data in a 1-dimensional array, needs to be displayed in isometric
+    * 2-dimensions.
+    */
     iToIsoX: function (i) {
-        return ((i % game.tiledMap.width) - Math.floor(i / game.tiledMap.width)) * 
-            game.tiledMap.tilewidth / 2 + game.tiledMap.tilewidth / 2 * 
+        return ((i % game.tiledMap.width) - Math.floor(i / game.tiledMap.width))
+            * game.tiledMap.tilewidth / 2 + game.tiledMap.tilewidth / 2 *
             game.tiledMap.width / 2 - game.tiledMap.tilewidth / 2;
     },
 
@@ -95,9 +90,10 @@ var playState = {
      * 2-dimensions.
      */
     iToIsoY: function (i) {
-        return ((i % game.tiledMap.width) + Math.floor(i / game.tiledMap.height)) * 
-            game.tiledMap.tileheight / 2 - game.tiledMap.tileheight / 2 * 
-            game.tiledMap.height / 2 + game.tiledMap.tileheight / 2;
+        return ((i % game.tiledMap.width) + 
+            Math.floor(i / game.tiledMap.height)) * game.tiledMap.tileheight / 
+            2 - game.tiledMap.tileheight / 2 * game.tiledMap.height / 2 + 
+            game.tiledMap.tileheight / 2;
     },
 
     /** 
@@ -108,8 +104,8 @@ var playState = {
      * displayed in isometric 2-dimensions.
      */
     XYToIsoX: function (x, y) {
-        return (x - y) * game.tiledMap.tilewidth / 2 + game.tiledMap.tilewidth / 2 * 
-            game.tiledMap.width / 2 - game.tiledMap.tilewidth / 2;
+        return (x - y) * game.tiledMap.tilewidth / 2 + game.tiledMap.tilewidth 
+        / 2 * game.tiledMap.width / 2 - game.tiledMap.tilewidth / 2;
     },
 
     /** 
@@ -120,34 +116,9 @@ var playState = {
      * displayed in isometric 2-dimensions.
      */
     XYToIsoY: function (x, y) {
-        return (x + y) * game.tiledMap.tileheight / 2 - game.tiledMap.tileheight / 2 * 
-            game.tiledMap.height / 2 + game.tiledMap.tileheight / 2;
-    },
-
-    /**
-     * Draws the tile at the isometric counterpart of its specified position 
-     * and adds it to the specified group.
-     * This function simplifies the usual draw method by setting a default
-     * isometric translation, tileset, and anchor.
-     * Group is necessary to depth sort the tiles, when the player starts to
-     * move behind the houses.
-     */
-    drawTile: function (tile, i, group) {
-
-        // Draw the image to the isometric coordinates
-        var image = game.add.image(
-            this.iToIsoX(i),
-            this.iToIsoY(i),
-            'tileset', 
-            tile, 
-            group
-        );
-
-        // Set the anchor to the middle for easier positioning
-        image.anchor.setTo(0.5, 0.5);
-
-        // Return the image to make the optional coloring possible
-        return image;
+        return (x + y) * game.tiledMap.tileheight / 2 - 
+        game.tiledMap.tileheight / 2 * game.tiledMap.height / 2 +
+            game.tiledMap.tileheight / 2;
     },
 
     /**
@@ -155,67 +126,25 @@ var playState = {
      * The houses that will block the player and the flood's movement.
      * The player itself that will push the barriers to the correct places.
      * And the barriers the will stop the flood.
-     */ 
+     */
     drawScene: function (tile, i) {
 
-        if (tile > 68) { 
+        var x = this.iToX(i), y = this.iToY(i);
+
+        if (tile > 68) {
 
             // If the tile is a house draw and color it part by part
-            game.map.setXYZ(this.iToX(i), this.iToY(i), 1, new House(
-                this.iToX(i), 
-                this.iToY(i), 
-                tile, 
-                tile + 1, 
-                tile + 2, 
-                game.scene
-            ));
+            new House(x, y, 1, tile, tile + 1, tile + 2);
 
         } else if (tile === 37) {
 
             // If the tile is a dozer draw it and set it as the player
-            game.player = this.drawActor(tile, i);
+            game.player = new Actor(x, y, 1, tile - 1);
 
         } else if (tile === 33 || tile === 34) {
 
-            // If the tile is a barrier draw it as is and add to the barriers
-            game.barriers.push(this.drawActor(tile, i));
-        }
-    },
-
-    /**
-     * Draws the houses using the three parts that can be found next to house
-     * placeholder in the tileset. The first two parts will be colored randomly,
-     * and the last part will be drawn as is.
-     */ 
-    drawHouse: function (tile, i) {
-
-        // Pick a random color hue
-        var color = Phaser.Color.HSLtoRGB(Math.random(), 1, 0.5);
-
-        // Draw and color the wall
-        this.drawTile(tile, i, game.scene).tint = 
-            Phaser.Color.createColor(color.r, color.g, color.b).color;
-
-        // Draw and color the roof with a different color
-        this.drawTile(tile + 1, i, game.scene).tint = 
-            Phaser.Color.createColor(color.g, color.b, color.r).color;
-
-        // Draw the rest
-        this.drawTile(tile + 2, i, game.scene);
-    },
-    
-    /**
-     * Draws the actor based on the index of its tile in the tileset and the
-     * index of its position in the map stored in a 1-dimensional array. 
-     * Also adds the actor to the specificed group and stores the 
-     * 2-dimenstional coordinates of its original position.
-     * Finally returns the prepared object for further manipulations.
-     */ 
-    drawActor: function (tile, i) {
-        return {
-            image: this.drawTile(tile - 1, i, game.scene),
-            x: this.iToX(i),
-            y: this.iToY(i)
+            // If the tile is a barrier draw it as is
+            new Actor(x, y, 1, tile - 1);
         }
     },
 
@@ -243,20 +172,20 @@ var playState = {
         }
 
         // If there is a barrier in the way push the barrier
-        if(!this.moveBarrier(this.getBarrier(x, y), xd, yd)) {
+        if (!this.moveBarrier(this.getBarrier(x, y), xd, yd)) {
             return false;
         }
-    
+
         // Move the player to the specified position
         game.player.x = x;
         game.player.y = y;
-        
+
         // Face the sprite to the specified direction
         game.player.image.frame = tile;
-        
+
         // Update the position of the player and its image
         this.moveActor(game.player, x, y, 200);
-        
+
         return true;
     },
 
@@ -285,31 +214,31 @@ var playState = {
      * moves faster than the wave and water.
      */
     moveBarrier: function (i, xd, yd) {
-        
-        var x, y; 
+
+        var x, y;
 
         // If there is no barrier let the player move
         if (i === -1) {
             return true;
         }
-        
+
         // Determine the path of the barrier indexed i
-        x = game.barriers[i].x + xd; 
+        x = game.barriers[i].x + xd;
         y = game.barriers[i].y + yd;
-        
+
         // If there is no street in the way ignore the input
         if (!game.map.getXYZ(x, y, 0).isStreet()) {
             return false;
         }
-        
+
         // If there is a barrier in the way ignore the input
         if (this.getBarrier(x, y) !== -1) {
             return false;
-        } 
+        }
 
         // Update the position of the barrier and its image
         this.moveActor(game.barriers[i], x, y, 200);
-        
+
         // Let the player move
         return true;
     },
@@ -323,10 +252,10 @@ var playState = {
         // Move the actor to the specified position
         actor.x = x;
         actor.y = y;
-        
+
         // Move the image of the actor to the specified position
         game.add.tween(actor.image).to({
-            x: this.XYToIsoX(x, y), 
+            x: this.XYToIsoX(x, y),
             y: this.XYToIsoY(x, y)
         }, time, Phaser.Easing.None, true);
     },
@@ -343,7 +272,7 @@ var playState = {
 
             // Draw the wave
             game.waves.push(this.drawWave(45, i + game.tiledMap.width, 0, 1));
-            
+
             // Draw the water behind the wave
             game.water.push(this.drawWave(61, i, 0, 1));
         }
@@ -358,7 +287,7 @@ var playState = {
     drawWave: function (tile, i, xd, yd) {
 
         // Draw the wave or water based on the tile and map index
-        var wave = this.drawActor(tile, i);   
+        var wave = this.drawActor(tile, i);
 
         // Extend the wave or water object with the x distance
         wave.xd = xd;
@@ -372,40 +301,35 @@ var playState = {
 
     update: function () {
 
+        // Draw the overlapping actors in the correct order
+        game.scene.sort('y', Phaser.Group.SORT_ASCENDING);
+
+        // If the player is already moving ignore the input
+        if (game.tweens.isTweening(game.player.image)) {
+            return false;
+        }
+
         // Set the movement buttons
         if (game.input.keyboard.isDown(Phaser.KeyCode.UP)) {
 
             // Set the move up button
-            this.movePlayer(0, -1, 38);
+            game.player.move(0, -1, 38);
 
         } else if (game.input.keyboard.isDown(Phaser.KeyCode.DOWN)) {
 
             // Set the move down button
-            this.movePlayer(0, 1, 36);
+            game.player.move(0, 1, 36);
 
         } else if (game.input.keyboard.isDown(Phaser.KeyCode.LEFT)) {
 
             // Set the move left button
-            this.movePlayer(-1, 0, 39);
+            game.player.move(-1, 0, 39);
 
         } else if (game.input.keyboard.isDown(Phaser.KeyCode.RIGHT)) {
 
             // Set the move right button
-            this.movePlayer(1, 0, 37);
-        }
-
-        // If there is any wave on the map move it
-        if (game.waves.length) {
-            game.waves.forEach(this.moveWave, this);
-        }
-
-        // If there is any water on the map move it
-        if (game.water.length) {
-            game.water.forEach(this.moveWater, this);
-        }
-
-        // Draw the overlapping actors in the correct order
-        game.scene.sort('y', Phaser.Group.SORT_ASCENDING);
+            game.player.move(1, 0, 37);
+        }        
     },
 
     /**
@@ -420,7 +344,7 @@ var playState = {
         if (wave === null) {
             return false;
         }
-        
+
         // If the wave is already moving leave it moving
         if (game.tweens.isTweening(wave.image)) {
             return false;
@@ -471,9 +395,9 @@ var playState = {
      * Moves the water like a wave but raises the water level behind it.
      */
     moveWater: function (water, i) {
-        
+
         var x, y;
-        
+
         // If the water is already moving leave it moving
         if (game.tweens.isTweening(water.image)) {
             return false;

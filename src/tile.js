@@ -10,10 +10,10 @@
  * to properly display them isometrically.
  * @param {number} x - The x coordinate of the tile object.
  * @param {number} y - The y coordinate of the tile object.
+ * @param {number} z - The z coordinate of the tile object.
  * @param {number} i - The index of the tile's image within the tileset.
- * @param {Phaser.Group} layer - The layer of the tile to be displayed on.
  */
-var Tile = function (x, y, i, layer) {
+var Tile = function (x, y, z, i) {
 
     /**
      * @property {number} x - The x coordinate of the tile object.
@@ -26,6 +26,11 @@ var Tile = function (x, y, i, layer) {
     this.y = y;
 
     /**
+     * @property {number} z - The z coordinate of the tile object.
+     */
+    this.z = z;
+
+    /**
      * @property {number} i - The index of the tile's image.
      */
     this.i = i;
@@ -33,12 +38,18 @@ var Tile = function (x, y, i, layer) {
     /**
      * @property {Phaser.Group} layer - The layer of the tile.
      */
-    this.layer = layer;
+    this.layer = z ? game.scene : game.background;
 
     /**
      * @property {Phaser.Image} image - The image of the tile.
      */
     this.image = this.addImage();
+
+    /**
+     * Add the Tile to the game map.
+     */
+    game.map.setXYZ(x, y, z, this); 
+
 }
 
 /**
@@ -51,8 +62,8 @@ Tile.prototype.addImage = function () {
      * Draw the isometric Tile and add to the specified layer.
      */
     return game.add.image(
-        this.getIsometricX(), 
-        this.getIsometricY(), 
+        this.getIsoX(), 
+        this.getIsoY(), 
         'tileset', 
         this.i, 
         this.layer
@@ -66,7 +77,7 @@ Tile.prototype.addImage = function () {
  * This function comes handy when a 2-dimensional position needs to be 
  * displayed in isometric 2-dimensions.
  */
-Tile.prototype.getIsometricX = function () {
+Tile.prototype.getIsoX = function () {
     return (this.x - this.y) * game.tiledMap.tilewidth / 2 + 
         game.tiledMap.tilewidth / 2 * game.tiledMap.width / 2 - 
         game.tiledMap.tilewidth;
@@ -79,7 +90,7 @@ Tile.prototype.getIsometricX = function () {
  * This function comes handy when a 2-dimensional position needs to be 
  * displayed in isometric 2-dimensions.
  */
-Tile.prototype.getIsometricY = function () {
+Tile.prototype.getIsoY = function () {
     return (this.x + this.y) * game.tiledMap.tileheight / 2 - 
         game.tiledMap.tileheight / 2 * game.tiledMap.height / 2 - 
         game.tiledMap.tileheight / 2;
@@ -92,4 +103,13 @@ Tile.prototype.getIsometricY = function () {
  */
 Tile.prototype.isStreet = function () {
     return this.i > 8 && this.i < 22;
+}
+
+/**
+ * Returns true if the current tile is a barrier.
+ * This function comes handy when it needs to be decided if the tile is 
+ * pushable by the player or not.
+ */
+Tile.prototype.isBarrier = function () {
+    return this.i === 33 || this.i === 34;
 }
