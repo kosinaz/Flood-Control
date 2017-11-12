@@ -113,3 +113,21 @@ Tile.prototype.isStreet = function () {
 Tile.prototype.isBarrier = function () {
     return this.i === 32 || this.i === 33;
 }
+
+/**
+ * Returns true if the current tile is a house.
+ * This function comes handy when it needs to be decided if the tile is 
+ * passable by the waves or not.
+ */
+Tile.prototype.isHouse = function () {
+    return this.i > 67;
+}
+
+/**
+ * Returns true if the current tile is water.
+ * This function comes handy when it needs to be decided if the tile is 
+ * already flooded or not.
+ */
+Tile.prototype.isWater = function () {
+    return this.i === 60;
+}

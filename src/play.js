@@ -2,31 +2,40 @@ var playState = {
 
     create: function () {
 
-        // Set the map
+        /**
+         * Set the map.
+         */ 
         game.tiledMap = game.cache.getJSON('level');
 
-        // Group the background layer to display everything else above it
+        /**
+         * Group the background layer to display everything else above it.
+         */ 
         game.background = game.add.group();
 
-        // Group the scene to make it depth sortable after each movement
+        /**
+         * Group the scene to make it depth sortable after each movement.
+         */
         game.scene = game.add.group();
 
-        // Store the barriers and refer to them later during movement
-        game.barriers = [];
-
+        /**
+         * Store all tiles, houses and actors of the current map.
+         */ 
         game.map = new Map();
 
-        game.waves = [];
-        game.water = [];
-
-        // Draw each tile of the background
+        /**
+         * Draw each tile of the background.
+         */ 
         game.tiledMap.layers[0].data.forEach(this.drawBackground, this);
 
-        // Draw each tile of the scene
+        /**
+         * Draw each tile of the scene.
+         */ 
         game.tiledMap.layers[1].data.forEach(this.drawScene, this);
 
-        // Delay the flood
-        //game.time.events.add(Phaser.Timer.SECOND * 10, this.startFlood, this);
+        /**
+         * Delay the flood.
+         */ 
+        game.time.events.add(Phaser.Timer.SECOND * 1, this.startFlood, this);
     },
 
     /**
@@ -35,7 +44,9 @@ var playState = {
      */
     drawBackground: function (tile, i) {
 
-        // Draw the tile at the isometric counterpart of its specified position
+        /**
+         * Draw the tile at the isometric counterpart of its specified position.
+         */ 
         new Tile(this.iToX(i), this.iToY(i), 0, tile - 1);
     },
 
@@ -68,22 +79,31 @@ var playState = {
      */
     drawScene: function (tile, i) {
 
+        /**
+         * Set the tile at the isometric counterpart of its specified position.
+         */
         var x = this.iToX(i), y = this.iToY(i);
 
         if (tile > 68) {
 
-            // If the tile is a house draw and color it part by part
+            /**
+             * If the tile is a house draw and color it part by part.
+             */ 
             new House(x, y, 1, tile, tile + 1, tile + 2);
 
         } else if (tile === 37) {
 
-            // If the tile is a dozer draw it and set it as the player
-            game.player = new Actor(x, y, 1, tile - 1);
+            /**
+             * If the tile is a dozer draw it and set it as the player.
+             */ 
+            game.player = new Actor(x, y, tile - 1);
 
         } else if (tile === 33 || tile === 34) {
 
-            // If the tile is a barrier draw it as is
-            new Actor(x, y, 1, tile - 1);
+            /**
+             * If the tile is a barrier draw it as is.
+             */ 
+            new Actor(x, y, tile - 1);
         }
     },
 
@@ -95,35 +115,20 @@ var playState = {
     startFlood: function () {
 
         // Create a wave on each tile of the top of the map
-        for (var i = 0; i < game.tiledMap.width; i += 1) {
+       // for (var i = 0; i < game.tiledMap.width; i += 1) {
 
             // Draw the wave
-            game.waves.push(this.drawWave(45, i + game.tiledMap.width, 0, 1));
+            //this.drawWave(45, i + game.tiledMap.width, 0, 1));
+        //new Wave(10, -1, 60).move(0, 1);
+        new Wave(10, 0, 44).move(0, 1);
+        //new Wave(11, -1, 60).move(0, 1);
+        new Wave(11, 0, 44).move(0, 1);
+        //new Wave(12, -1, 60).move(0, 1);
+        new Wave(12, 0, 44).move(0, 1);
 
             // Draw the water behind the wave
-            game.water.push(this.drawWave(61, i, 0, 1));
-        }
-    },
-
-    /**
-     * Draws the wave or water and sets its direction of movement based on its
-     * tile in the tileset, map index of its position and the x and y distance 
-     * of the original position of the wave and its destination.
-     * For starting waves and waters xd will be 0 and yd will be 1.
-     */
-    drawWave: function (tile, i, xd, yd) {
-
-        // Draw the wave or water based on the tile and map index
-        var wave = this.drawActor(tile, i);
-
-        // Extend the wave or water object with the x distance
-        wave.xd = xd;
-
-        // Extend the wave or water object with the y distance
-        wave.yd = yd;
-
-        // Return the extended wave or water object
-        return wave;
+            //game.water.push(this.drawWave(61, i, 0, 1));
+        //}
     },
 
     update: function () {
@@ -157,93 +162,5 @@ var playState = {
             // Set the move right button
             game.player.move(1, 0, 37);
         }        
-    },
-
-    /**
-     * Move the towards the direction predefined for it and store its index in
-     * waves for optional removal.
-     */
-    moveWave: function (wave, i) {
-
-        var x, y;
-
-        // If the wave reached a house or a barrier continue with the next wave
-        if (wave === null) {
-            return false;
-        }
-
-        // If the wave is already moving leave it moving
-        if (game.tweens.isTweening(wave.image)) {
-            return false;
-        }
-
-        // Determine the path of the wave based on its predefined direction
-        x = wave.x + wave.xd;
-        y = wave.y + wave.yd;
-
-
-        // If there is a house or barrier in front of the wave remove it
-        if (this.blocks(x, y)) {
-
-            // Delay the removal of the wave with the tween time of the water
-            game.time.events.add(Phaser.Timer.SECOND * 1, this.removeWave, {
-                i: i
-            });
-            return false;
-        }
-
-        // Update the position of the wave and its image
-        this.moveActor(wave, x, y, 1000);
-    },
-
-    /**
-     * Returns true if a house or a barrier can be found in the specified 
-     * position of the map.
-     * This comes handy when it should be decided if the tile is passable by 
-     * the wave or not.
-     */
-    blocks: function (x, y) {
-        return game.tiledMap.layers[1].data[this.XYToI(x, y)] > 67 ||
-            this.getBarrier(x, y) !== -1;
-    },
-
-    /**
-     * Remove a wave based on the array of waves and the index of wave to be
-     * removed passed in the this object of the callee. 
-     */
-    removeWave: function () {
-
-        // Hide the image of the wave
-        game.waves[this.i].image.kill();
-
-    },
-
-    /**
-     * Moves the water like a wave but raises the water level behind it.
-     */
-    moveWater: function (water, i) {
-
-        var x, y;
-
-        // If the water is already moving leave it moving
-        if (game.tweens.isTweening(water.image)) {
-            return false;
-        }
-
-        // Determine the path of the water based on its predefined direction
-        x = water.x + water.xd;
-        y = water.y + water.yd;
-
-
-        // If there is a house or barrier in front of the water stop it
-        if (this.blocks(x, y)) {
-            return false;
-        }
-
-        // Update the position of the water and its image
-        this.moveActor(water, x, y, 1000);
-
-        // Leave a raised water behind
-        this.drawTile(60, this.XYToI(water.x, water.y - 1), game.scene);
     }
-};
+}
