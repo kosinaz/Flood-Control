@@ -111,5 +111,5 @@ Tile.prototype.isStreet = function () {
  * pushable by the player or not.
  */
 Tile.prototype.isBarrier = function () {
-    return this.i === 33 || this.i === 34;
+    return this.i === 32 || this.i === 33;
 }

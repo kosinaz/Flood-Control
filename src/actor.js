@@ -31,7 +31,7 @@ Actor.constructor = Actor;
 Actor.prototype.move = function (x, y, i) {
 
   // Determine the destination 
-  var dx = game.player.x + x, dy = game.player.y + y;
+  var dx = this.x + x, dy = this.y + y;
 
   // If the destination is not a street ignore the input
   if (!game.map.getXYZ(dx, dy, 0).isStreet()) {
@@ -39,18 +39,22 @@ Actor.prototype.move = function (x, y, i) {
   }
 
   // If the destination is a barrier and the actor is the player push it.
-  if (game.map.getXYZ(dx, dy, 1).isBarrier() && game.player === this) {
-    if (!game.map.getXYZ(dx, dy, 1).move(dx + x, dy + y)) {
+  if (game.map.getXYZ(dx, dy, 1).isBarrier()) {
+    if (game.player !== this) {
+      return false;
+    }
+    if (!game.map.getXYZ(dx, dy, 1).move(x, y)) {
       return false;
     }
   }
 
   // Move the actor to its destination
+  game.map.moveXYZ(this.x, this.y, 1, dx, dy, 1);
   this.x = dx;
   this.y = dy;
 
   // Face the image to the specified direction if needed
-  game.player.image.frame = i || game.player.image.frame;
+  this.image.frame = i || this.image.frame;
 
   // Update the position of the player and its image
   game.add.tween(this.image).to({

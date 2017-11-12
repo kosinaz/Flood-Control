@@ -26,7 +26,7 @@ var playState = {
         game.tiledMap.layers[1].data.forEach(this.drawScene, this);
 
         // Delay the flood
-        game.time.events.add(Phaser.Timer.SECOND * 10, this.startFlood, this);
+        //game.time.events.add(Phaser.Timer.SECOND * 10, this.startFlood, this);
     },
 
     /**
@@ -60,67 +60,6 @@ var playState = {
         return Math.floor(i / game.tiledMap.width);
     },
 
-    /** 
-     * Translates a 2-dimensional position into a 1-dimensional index of a map.
-     * This function comes handy when a position of Tiled map, that stores the 
-     * map data in a 1-dimensional array, needs to be checked or updated.
-     */
-    XYToI: function (x, y) {
-        return x + y * game.tiledMap.width;
-    },
-
-    /** 
-    * Translates a 1-dimensional index into an isometric x coordinate of a 
-    * 2-dimensional map and positions it to the middle of the screen.
-    * This function comes handy when an isometric Tiled map, that stores the 
-    * map data in a 1-dimensional array, needs to be displayed in isometric
-    * 2-dimensions.
-    */
-    iToIsoX: function (i) {
-        return ((i % game.tiledMap.width) - Math.floor(i / game.tiledMap.width))
-            * game.tiledMap.tilewidth / 2 + game.tiledMap.tilewidth / 2 *
-            game.tiledMap.width / 2 - game.tiledMap.tilewidth / 2;
-    },
-
-    /** 
-     * Translates a 1-dimensional index into an isometric y coordinate of a 
-     * 2-dimensional map and positions it to the middle of the screen.
-     * This function comes handy when an isometric Tiled map, that stores the 
-     * map data in a 1-dimensional array, needs to be displayed in isometric
-     * 2-dimensions.
-     */
-    iToIsoY: function (i) {
-        return ((i % game.tiledMap.width) + 
-            Math.floor(i / game.tiledMap.height)) * game.tiledMap.tileheight / 
-            2 - game.tiledMap.tileheight / 2 * game.tiledMap.height / 2 + 
-            game.tiledMap.tileheight / 2;
-    },
-
-    /** 
-     * Translates an x and y coordinate of a 2-dimensional position into an 
-     * isometric x coordinate of a 2-dimensional map and positions it to the 
-     * middle of the screen.
-     * This function comes handy when a 2-dimensional position needs to be 
-     * displayed in isometric 2-dimensions.
-     */
-    XYToIsoX: function (x, y) {
-        return (x - y) * game.tiledMap.tilewidth / 2 + game.tiledMap.tilewidth 
-        / 2 * game.tiledMap.width / 2 - game.tiledMap.tilewidth / 2;
-    },
-
-    /** 
-     * Translates an x and y coordinate of a 2-dimensional position into an 
-     * isometric y coordinate of a 2-dimensional map and positions it to the 
-     * middle of the screen.
-     * This function comes handy when a 2-dimensional position needs to be 
-     * displayed in isometric 2-dimensions.
-     */
-    XYToIsoY: function (x, y) {
-        return (x + y) * game.tiledMap.tileheight / 2 - 
-        game.tiledMap.tileheight / 2 * game.tiledMap.height / 2 +
-            game.tiledMap.tileheight / 2;
-    },
-
     /**
      * Draws all the elements of the map that will be acted upon somehow.
      * The houses that will block the player and the flood's movement.
@@ -146,118 +85,6 @@ var playState = {
             // If the tile is a barrier draw it as is
             new Actor(x, y, 1, tile - 1);
         }
-    },
-
-    /**
-     * Move the player to a nearby position based on the x and y distance of
-     * the original position of the player and its destination, also draw the
-     * proper tile of the player based on its direction.
-     * The player's original position is already stored, and the player can
-     * move either to next or previous x or y position, so one of the 
-     * parameters will be always 0.
-     */
-    movePlayer: function (xd, yd, tile) {
-
-        // Determine the path of the player 
-        var x = game.player.x + xd, y = game.player.y + yd;
-
-        // If the player is already moving ignore the input
-        if (game.tweens.isTweening(game.player.image)) {
-            return false;
-        }
-
-        // If there is no street in the way ignore the input
-        if (!game.map.getXYZ(x, y, 0).isStreet()) {
-            return false;
-        }
-
-        // If there is a barrier in the way push the barrier
-        if (!this.moveBarrier(this.getBarrier(x, y), xd, yd)) {
-            return false;
-        }
-
-        // Move the player to the specified position
-        game.player.x = x;
-        game.player.y = y;
-
-        // Face the sprite to the specified direction
-        game.player.image.frame = tile;
-
-        // Update the position of the player and its image
-        this.moveActor(game.player, x, y, 200);
-
-        return true;
-    },
-
-    /**
-     * Iterates through all the barriers and returns the index of the barrier 
-     * that can be found in the specified position of the map.
-     * The index is necessary to move the barrier.
-     */
-    getBarrier: function (x, y) {
-        for (var i = 0; i < game.barriers.length; i += 1) {
-            if (game.barriers[i].x === x && game.barriers[i].y === y) {
-                return i;
-            }
-        }
-        return -1;
-    },
-
-    /**
-     * Move the barrier indexed i to a nearby position based on the x and y 
-     * distance of the original position of the barrier and its destination in
-     * a specified time.
-     * The barrier's original position is already stored, and the barrier can
-     * move either to next or previous x or y position, so one of the 
-     * parameters will be always 0.
-     * The specification of time is necessary, because the player and barrier
-     * moves faster than the wave and water.
-     */
-    moveBarrier: function (i, xd, yd) {
-
-        var x, y;
-
-        // If there is no barrier let the player move
-        if (i === -1) {
-            return true;
-        }
-
-        // Determine the path of the barrier indexed i
-        x = game.barriers[i].x + xd;
-        y = game.barriers[i].y + yd;
-
-        // If there is no street in the way ignore the input
-        if (!game.map.getXYZ(x, y, 0).isStreet()) {
-            return false;
-        }
-
-        // If there is a barrier in the way ignore the input
-        if (this.getBarrier(x, y) !== -1) {
-            return false;
-        }
-
-        // Update the position of the barrier and its image
-        this.moveActor(game.barriers[i], x, y, 200);
-
-        // Let the player move
-        return true;
-    },
-
-    /**
-     * Update the position of the actor and its image to let the game display 
-     * and calculate with the current positon of the actor.
-     */
-    moveActor: function (actor, x, y, time) {
-
-        // Move the actor to the specified position
-        actor.x = x;
-        actor.y = y;
-
-        // Move the image of the actor to the specified position
-        game.add.tween(actor.image).to({
-            x: this.XYToIsoX(x, y),
-            y: this.XYToIsoY(x, y)
-        }, time, Phaser.Easing.None, true);
     },
 
     /**
