@@ -5,7 +5,7 @@
  * @param {number} xd - The index of the Wave's image within the tileset.
  */
 var Wave = function (x, y, xd, yd, i) {
-  
+
   /**
    * Set the x, y coordinates and the i index with the Actor's constructor.
    */
@@ -19,7 +19,7 @@ var Wave = function (x, y, xd, yd, i) {
   /**
    * Create a wave tile at the source of the wave.
    */
-  this.animation = new Tile(x - xd, y - yd, 1 , i);
+  this.animation = new Tile(x - xd, y - yd, 1, i);
 
   /**
    * Move it to the destination.
@@ -36,9 +36,14 @@ var Wave = function (x, y, xd, yd, i) {
   }, Phaser.Timer.SECOND * 1, Phaser.Easing.None, true);
 
   /**
-   * Spread the water after each movement.
+   * Spread the water.
    */
   game.time.events.add(Phaser.Timer.SECOND * 1, this.spread, this);
+
+  /**
+   * Spread the water diagonally.
+   */
+  game.time.events.add(Phaser.Timer.SECOND * 1.25, this.spreadDiagonally, this);
 
 }
 Wave.prototype = Object.create(Actor.prototype);
@@ -50,14 +55,14 @@ Wave.constructor = Wave;
 Wave.prototype.spread = function () {
 
   /**
-   * Create a new wave on the left if needed.
+   * Create a new wave on the top if needed.
    */
-  if (game.map.getXYZ(this.x + 1, this.y, 1).isFloodable()) {
-    new Wave(this.x + 1, this.y, 1, 0, 45);
+  if (game.map.getXYZ(this.x, this.y - 1, 1).isFloodable()) {
+    new Wave(this.x, this.y - 1, 0, -1, 49);
   }
 
   /**
-   * Create a new wave on the right if needed.
+   * Create a new wave on the left if needed.
    */
   if (game.map.getXYZ(this.x - 1, this.y, 1).isFloodable()) {
     new Wave(this.x - 1, this.y, -1, 0, 48);
@@ -71,10 +76,10 @@ Wave.prototype.spread = function () {
   }
 
   /**
-  * Create a new wave on the top if needed.
-  */
-  if (game.map.getXYZ(this.x, this.y - 1, 1).isFloodable()) {
-    new Wave(this.x, this.y - 1, 0, -1, 49);
+   * Create a new wave on the right if needed.
+   */
+  if (game.map.getXYZ(this.x + 1, this.y, 1).isFloodable()) {
+    new Wave(this.x + 1, this.y, 1, 0, 45);
   }
 
   /**
@@ -86,4 +91,38 @@ Wave.prototype.spread = function () {
    * Hide the wave.
    */
   this.animation.image.frame = 0;
+}
+
+/**
+ * Moves the wave and creates new waves towards other directions if possible.
+ */
+Wave.prototype.spreadDiagonally = function () {
+
+  /**
+   * Create a new wave on the top-left if needed.
+   */
+  if (game.map.getXYZ(this.x - 1, this.y - 1, 1).isFloodable()) {
+    new Wave(this.x - 1, this.y - 1, -1, -1, 48);
+  }
+
+  /**
+   * Create a new wave on the bottom-left if needed.
+   */
+  if (game.map.getXYZ(this.x - 1, this.y + 1, 1).isFloodable()) {
+    new Wave(this.x - 1, this.y + 1, -1, 1, 44);
+  }
+
+  /**
+   * Create a new wave on the bottom-right if needed.
+   */
+  if (game.map.getXYZ(this.x + 1, this.y + 1, 1).isFloodable()) {
+    new Wave(this.x + 1, this.y + 1, 1, 1, 44);
+  }
+
+  /**
+   * Create a new wave on the top-right if needed.
+   */
+  if (game.map.getXYZ(this.x + 1, this.y - 1, 1).isFloodable()) {
+    new Wave(this.x + 1, this.y - 1, 1, -1, 45);
+  }
 }
