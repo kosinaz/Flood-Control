@@ -35,7 +35,7 @@ var playState = {
         /**
          * Delay the flood.
          */ 
-        game.time.events.add(Phaser.Timer.SECOND * 0, this.startFlood, this);
+        game.time.events.add(Phaser.Timer.SECOND * 30, this.startFlood, this);
     },
 
     /**

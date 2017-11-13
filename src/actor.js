@@ -41,6 +41,13 @@ Actor.prototype.move = function (x, y, i) {
   }
 
   /**
+   * If the destination is water ignore the input.
+   */
+  if (game.map.getXYZ(dx, dy, 1).isWater()) {
+    return false;
+  }
+
+  /**
    * If the destination is a barrier and the actor is the player push it.
    */ 
   if (game.map.getXYZ(dx, dy, 1).isBarrier()) {
