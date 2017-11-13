@@ -129,5 +129,15 @@ Tile.prototype.isHouse = function () {
  * already flooded or not.
  */
 Tile.prototype.isWater = function () {
-    return this.i === 60;
+    return this.i === 60 || this.i === 44 || this.i === 45 || this.i === 48 ||
+        this.i === 49;
+}
+
+/**
+ * Returns true if the current tile is not water, not house, or not barrier.
+ * This function comes handy when it needs to be decided if the tile is 
+ * floodable or not.
+ */
+Tile.prototype.isFloodable = function () {
+    return !(this.isWater() || this.isHouse() || this.isBarrier());
 }

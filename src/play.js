@@ -35,7 +35,7 @@ var playState = {
         /**
          * Delay the flood.
          */ 
-        game.time.events.add(Phaser.Timer.SECOND * 1, this.startFlood, this);
+        game.time.events.add(Phaser.Timer.SECOND * 0, this.startFlood, this);
     },
 
     /**
@@ -114,21 +114,16 @@ var playState = {
      */
     startFlood: function () {
 
-        // Create a wave on each tile of the top of the map
-       // for (var i = 0; i < game.tiledMap.width; i += 1) {
+        /**
+         * Create a wave on each tile of the top of the map.
+         */ 
+        for (var i = 0; i < game.tiledMap.width; i += 1) {
 
-            // Draw the wave
-            //this.drawWave(45, i + game.tiledMap.width, 0, 1));
-        //new Wave(10, -1, 60).move(0, 1);
-        new Wave(10, 0, 44).move(0, 1);
-        //new Wave(11, -1, 60).move(0, 1);
-        new Wave(11, 0, 44).move(0, 1);
-        //new Wave(12, -1, 60).move(0, 1);
-        new Wave(12, 0, 44).move(0, 1);
-
-            // Draw the water behind the wave
-            //game.water.push(this.drawWave(61, i, 0, 1));
-        //}
+            /**
+             * Create the wave.
+             */ 
+             new Wave(i, 0, 0, 1, 44);
+        }
     },
 
     update: function () {
