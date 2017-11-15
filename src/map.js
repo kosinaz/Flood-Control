@@ -1,6 +1,6 @@
 /**
  * Contains all the map data to provide information about where the player, the
- * barriers, and waves can go.
+ * walls, and waves can go.
  */
 var Map = function () {
 
@@ -40,7 +40,7 @@ Map.prototype.getXYZ = function (x, y, z) {
 }
 
 /**
- * Move the specified map data to the map at the given x and y coordinates.
+ * Move the specified map data to the given x, y and z coordinates.
  * @param {number} x1 - The x coordinate of the origin.
  * @param {number} y1 - The y coordinate of the origin.
  * @param {number} z1 - The z coordinate of the origin.
@@ -55,4 +55,35 @@ Map.prototype.moveXYZ = function (x1, y1, z1, x2, y2, z2) {
      */
     this.setXYZ(x2, y2, z2, this.getXYZ(x1, y1, z1));
     this.setXYZ(x1, y1, z1, null);
+}
+
+/**
+ * Returns true if there is no water, no house and no vertical wall in the
+ * specified position.
+ * @param {number} x 
+ * @param {number} y 
+ */
+Map.prototype.XYisFloodableHorizontally = function (x, y) {
+    return !this.XYisWater(x, y) && 
+        this.getXYZ(x, y, 1).isFloodableHorizontally();
+}
+
+/**
+ * Returns true if there is no water, no house and no horizontal wall in the
+ * specified position.
+ * @param {number} x 
+ * @param {number} y 
+ */
+Map.prototype.XYisFloodableVertically = function (x, y) {
+    return !this.XYisWater(x, y) && 
+        this.getXYZ(x, y, 1).isFloodableVertically();
+}
+
+/**
+ * Returns true if there is water in the specified position.
+ * @param {number} x 
+ * @param {number} y 
+ */
+Map.prototype.XYisWater = function (x, y) {
+    return !!this.map[x + ',' + y + ',' + 2];
 }

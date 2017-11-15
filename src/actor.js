@@ -1,15 +1,19 @@
 /**
  * Actors are special tiles that can move around and interact with each other.
+ * The z coordinate is required because the dozer and walls are on z = 1, but
+ * the water is on z = 2, even if they are all in the scene group and rendered 
+ * on the same isometric level.
  * @param {number} x - The x coordinate of the actor.
  * @param {number} y - The y coordinate of the actor.
+ * @param {number} z - The z coordinate of the actor.
  * @param {number} i - The index of the actor's image within the tileset.
  */
-var Actor = function (x, y, i) {
+var Actor = function (x, y, z, i) {
 
   /**
    * Set the x, y, z coordinates and the i index with the Tile's constructor.
    */
-  Tile.call(this, x, y, 1, i);
+  Tile.call(this, x, y, z, i);
 
 }
 Actor.prototype = Object.create(Tile.prototype);
@@ -43,14 +47,14 @@ Actor.prototype.move = function (x, y, i) {
   /**
    * If the destination is water ignore the input.
    */
-  if (game.map.getXYZ(dx, dy, 1).isWater()) {
+  if (game.map.XYisWater(dx, dy)) {
     return false;
   }
 
   /**
-   * If the destination is a barrier and the actor is the player push it.
+   * If the destination is a wall and the actor is the player push it.
    */ 
-  if (game.map.getXYZ(dx, dy, 1).isBarrier()) {
+  if (game.map.getXYZ(dx, dy, 1).isWall()) {
     if (game.player !== this) {
       return false;
     }
@@ -62,7 +66,7 @@ Actor.prototype.move = function (x, y, i) {
   /**
    * Move the actor to its destination.
    */ 
-  game.map.moveXYZ(this.x, this.y, 1, dx, dy, 1);
+  game.map.moveXYZ(this.x, this.y, this.z, dx, dy, this.z);
   this.x = dx;
   this.y = dy;
 

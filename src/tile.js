@@ -36,7 +36,9 @@ var Tile = function (x, y, z, i) {
     this.i = i;
 
     /**
-     * @property {Phaser.Group} layer - The layer of the tile.
+     * @property {Phaser.Group} layer - The layer of the tile. It is background
+     * for z = 0, and scene for z = 1 like the walls and the dozer and z = 2
+     * like the water.
      */
     this.layer = z ? game.scene : game.background;
 
@@ -106,12 +108,32 @@ Tile.prototype.isStreet = function () {
 }
 
 /**
- * Returns true if the current tile is a barrier.
+ * Returns true if the current tile is a wall.
  * This function comes handy when it needs to be decided if the tile is 
  * pushable by the player or not.
  */
-Tile.prototype.isBarrier = function () {
+Tile.prototype.isWall = function () {
     return this.i === 32 || this.i === 33;
+}
+
+/**
+ * Returns true if the current tile is a horizontal wall between two houses.
+ * This function comes handy when it needs to be decided if the tile is 
+ * floodable or not.
+ */
+Tile.prototype.wallsHorizontally = function () {
+    return this.i === 32 && game.map.getXYZ(this.x - 1, this.y, 1).isHouse() && 
+        game.map.getXYZ(this.x + 1, this.y, 1).isHouse();
+}
+
+/**
+ * Returns true if the current tile is a vertical wall between two houses.
+ * This function comes handy when it needs to be decided if the tile is 
+ * floodable or not.
+ */
+Tile.prototype.wallsVertically = function () {
+    return this.i === 33 && game.map.getXYZ(this.x, this.y - 1, 1).isHouse() &&
+        game.map.getXYZ(this.x, this.y + 1, 1).isHouse();
 }
 
 /**
@@ -124,20 +146,21 @@ Tile.prototype.isHouse = function () {
 }
 
 /**
- * Returns true if the current tile is water.
- * This function comes handy when it needs to be decided if the tile is 
- * already flooded or not.
- */
-Tile.prototype.isWater = function () {
-    return this.i === 60 || this.i === 44 || this.i === 45 || this.i === 48 ||
-        this.i === 49;
-}
-
-/**
- * Returns true if the current tile is not water, not house, or not barrier.
+ * Returns true if the current tile is not water, not house, or not a vertical 
+ * wall between two houses.
  * This function comes handy when it needs to be decided if the tile is 
  * floodable or not.
  */
-Tile.prototype.isFloodable = function () {
-    return !(this.isWater() || this.isHouse() || this.isBarrier());
+Tile.prototype.isFloodableHorizontally = function () {
+    return !(this.isHouse() || this.wallsVertically());
+}
+
+/**
+ * Returns true if the current tile is not water, not house, or not a 
+ * horizontal wall between two houses.
+ * This function comes handy when it needs to be decided if the tile is 
+ * floodable or not.
+ */
+Tile.prototype.isFloodableVertically = function () {
+    return !(this.isHouse() || this.wallsHorizontally());
 }

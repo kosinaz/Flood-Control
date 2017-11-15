@@ -1,5 +1,6 @@
 /**
  * Waves are special actors that constantly move and leave water behind them.
+ * The z coordinate is not necessary because all waves are z = 2.
  * @param {number} x - The x coordinate of the Wave.
  * @param {number} y - The y coordinate of the Wave.
  * @param {number} xd - The index of the Wave's image within the tileset.
@@ -9,7 +10,7 @@ var Wave = function (x, y, xd, yd, i) {
   /**
    * Set the x, y coordinates and the i index with the Actor's constructor.
    */
-  Actor.call(this, x, y, 60);
+  Actor.call(this, x, y, 2, 60);
 
   /**
    * Hide the water until the wave arrives.
@@ -19,7 +20,7 @@ var Wave = function (x, y, xd, yd, i) {
   /**
    * Create a wave tile at the source of the wave.
    */
-  this.animation = new Tile(x - xd, y - yd, 1, i);
+  this.animation = new Tile(x - xd, y - yd, 2, i);
 
   /**
    * Move it to the destination.
@@ -40,11 +41,6 @@ var Wave = function (x, y, xd, yd, i) {
    */
   game.time.events.add(Phaser.Timer.SECOND * 1, this.spread, this);
 
-  /**
-   * Spread the water diagonally.
-   */
-  game.time.events.add(Phaser.Timer.SECOND * 1.25, this.spreadDiagonally, this);
-
 }
 Wave.prototype = Object.create(Actor.prototype);
 Wave.constructor = Wave;
@@ -57,72 +53,54 @@ Wave.prototype.spread = function () {
   /**
    * Create a new wave on the top if needed.
    */
-  if (game.map.getXYZ(this.x, this.y - 1, 1).isFloodable()) {
+  if (game.map.XYisFloodableVertically(this.x, this.y - 1)) {
     new Wave(this.x, this.y - 1, 0, -1, 49);
   }
 
   /**
    * Create a new wave on the left if needed.
    */
-  if (game.map.getXYZ(this.x - 1, this.y, 1).isFloodable()) {
+  if (game.map.XYisFloodableHorizontally(this.x - 1, this.y)) {
     new Wave(this.x - 1, this.y, -1, 0, 48);
   }
 
   /**
    * Create a new wave on the bottom if needed.
    */
-  if (game.map.getXYZ(this.x, this.y + 1, 1).isFloodable()) {
+  if (game.map.XYisFloodableVertically(this.x, this.y + 1)) {
     new Wave(this.x, this.y + 1, 0, 1, 44);
   }
 
   /**
    * Create a new wave on the right if needed.
    */
-  if (game.map.getXYZ(this.x + 1, this.y, 1).isFloodable()) {
+  if (game.map.XYisFloodableHorizontally(this.x + 1, this.y)) {
     new Wave(this.x + 1, this.y, 1, 0, 45);
   }
 
   /**
-   * Leave the image of a raised water tile behind.
+   * If there is a misplaced wall.
    */
-  this.image.frame = 60;
+  if ((game.map.getXYZ(this.x, this.y, 1).i === 32 && 
+    !game.map.getXYZ(this.x, this.y, 1).wallsHorizontally()) ||
+    (game.map.getXYZ(this.x, this.y, 1).i === 33 && 
+    !game.map.getXYZ(this.x, this.y, 1).wallsVertically())) {
+
+    /**
+     * Set the wall flooded that is not between two houses.
+     */
+    game.map.getXYZ(this.x, this.y, 1).image.frame += 4;
+
+  } else {
+
+    /**
+     * Leave the image of a raised water tile behind on non-walled streets.
+     */
+    this.image.frame = 60;
+  }
 
   /**
    * Hide the wave.
    */
   this.animation.image.frame = 0;
-}
-
-/**
- * Moves the wave and creates new waves towards other directions if possible.
- */
-Wave.prototype.spreadDiagonally = function () {
-
-  /**
-   * Create a new wave on the top-left if needed.
-   */
-  if (game.map.getXYZ(this.x - 1, this.y - 1, 1).isFloodable()) {
-    new Wave(this.x - 1, this.y - 1, -1, -1, 48);
-  }
-
-  /**
-   * Create a new wave on the bottom-left if needed.
-   */
-  if (game.map.getXYZ(this.x - 1, this.y + 1, 1).isFloodable()) {
-    new Wave(this.x - 1, this.y + 1, -1, 1, 44);
-  }
-
-  /**
-   * Create a new wave on the bottom-right if needed.
-   */
-  if (game.map.getXYZ(this.x + 1, this.y + 1, 1).isFloodable()) {
-    new Wave(this.x + 1, this.y + 1, 1, 1, 44);
-  }
-
-  /**
-   * Create a new wave on the top-right if needed.
-   */
-  if (game.map.getXYZ(this.x + 1, this.y - 1, 1).isFloodable()) {
-    new Wave(this.x + 1, this.y - 1, 1, -1, 45);
-  }
 }

@@ -35,7 +35,7 @@ var playState = {
         /**
          * Delay the flood.
          */ 
-        game.time.events.add(Phaser.Timer.SECOND * 30, this.startFlood, this);
+        game.time.events.add(Phaser.Timer.SECOND * 3, this.startFlood, this);
     },
 
     /**
@@ -74,8 +74,8 @@ var playState = {
     /**
      * Draws all the elements of the map that will be acted upon somehow.
      * The houses that will block the player and the flood's movement.
-     * The player itself that will push the barriers to the correct places.
-     * And the barriers the will stop the flood.
+     * The player itself that will push the walls to the correct places.
+     * And the walls the will stop the flood.
      */
     drawScene: function (tile, i) {
 
@@ -91,19 +91,19 @@ var playState = {
              */ 
             new House(x, y, 1, tile, tile + 1, tile + 2);
 
-        } else if (tile === 37) {
+        } else if (tile === 53) {
 
             /**
              * If the tile is a dozer draw it and set it as the player.
              */ 
-            game.player = new Actor(x, y, tile - 1);
+            game.player = new Actor(x, y, 1, tile - 1);
 
         } else if (tile === 33 || tile === 34) {
 
             /**
-             * If the tile is a barrier draw it as is.
+             * If the tile is a wall draw it as is.
              */ 
-            new Actor(x, y, tile - 1);
+            new Actor(x, y, 1, tile - 1);
         }
     },
 
@@ -140,22 +140,22 @@ var playState = {
         if (game.input.keyboard.isDown(Phaser.KeyCode.UP)) {
 
             // Set the move up button
-            game.player.move(0, -1, 38);
+            game.player.move(0, -1, 54);
 
         } else if (game.input.keyboard.isDown(Phaser.KeyCode.DOWN)) {
 
             // Set the move down button
-            game.player.move(0, 1, 36);
+            game.player.move(0, 1, 52);
 
         } else if (game.input.keyboard.isDown(Phaser.KeyCode.LEFT)) {
 
             // Set the move left button
-            game.player.move(-1, 0, 39);
+            game.player.move(-1, 0, 55);
 
         } else if (game.input.keyboard.isDown(Phaser.KeyCode.RIGHT)) {
 
             // Set the move right button
-            game.player.move(1, 0, 37);
+            game.player.move(1, 0, 53);
         }        
     }
 }
