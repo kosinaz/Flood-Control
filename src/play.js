@@ -36,7 +36,7 @@ var playState = {
          * Delay the flood.
          */
         this.timer = game.time.create(false),
-        this.timer.add(Phaser.Timer.SECOND * 60, this.startFlood, this);
+        this.timer.add(Phaser.Timer.SECOND * 59, this.startFlood, this);
         this.timer.start();
 
         /**
@@ -46,6 +46,16 @@ var playState = {
             font: 'bold 30pt Arial',
             fill: '#fff'
         });
+
+        /**
+         * Set the fast forward button.
+         */
+        this.skipButton = game.add.text(130, 40, '⏩', {
+            font: 'bold 30pt Arial',
+            fill: '#f00'
+        });
+        this.skipButton.inputEnabled = true;
+        this.skipButton.events.onInputUp.add(this.skip, this);
     },
 
     /**
@@ -187,6 +197,11 @@ var playState = {
              */ 
             game.player.move(1, 0, 53);
         }        
+    },
+
+    skip: function () {
+        this.timer.stop(true);
+        this.startFlood();
     },
 
     lose: function () {
