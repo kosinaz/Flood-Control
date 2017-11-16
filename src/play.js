@@ -34,8 +34,18 @@ var playState = {
 
         /**
          * Delay the flood.
-         */ 
-        game.time.events.add(Phaser.Timer.SECOND * 3, this.startFlood, this);
+         */
+        this.timer = game.time.create(false),
+        this.timer.add(Phaser.Timer.SECOND * 60, this.startFlood, this);
+        this.timer.start();
+
+        /**
+         * Set the timer text.
+         */
+        this.timerLabel = game.add.text(40, 40, '0:00', {
+            font: 'bold 30pt Arial',
+            fill: '#fff'
+        });
     },
 
     /**
@@ -128,34 +138,62 @@ var playState = {
 
     update: function () {
 
-        // Draw the overlapping actors in the correct order
+        /**
+         * Update the seconds left until the flood.
+         */
+        var seconds = Math.ceil(this.timer.duration / 1000);
+        this.timerLabel.text = '0:' + (seconds < 10 ? '0' : '') + seconds;
+
+        /**
+         * Draw the overlapping actors in the correct order.
+         */ 
         game.scene.sort('y', Phaser.Group.SORT_ASCENDING);
 
-        // If the player is already moving ignore the input
+        /**
+         * If the player is already moving ignore the input.
+         */ 
         if (game.tweens.isTweening(game.player.image)) {
             return false;
         }
 
-        // Set the movement buttons
+        /**
+         * Set the movement buttons.
+         */ 
         if (game.input.keyboard.isDown(Phaser.KeyCode.UP)) {
 
-            // Set the move up button
+            /**
+             * Set the move up button.
+             */ 
             game.player.move(0, -1, 54);
 
         } else if (game.input.keyboard.isDown(Phaser.KeyCode.DOWN)) {
 
-            // Set the move down button
+            /**
+             * Set the move down button.
+             */ 
             game.player.move(0, 1, 52);
 
         } else if (game.input.keyboard.isDown(Phaser.KeyCode.LEFT)) {
 
-            // Set the move left button
+            /**
+             * Set the move left button.
+             */ 
             game.player.move(-1, 0, 55);
 
         } else if (game.input.keyboard.isDown(Phaser.KeyCode.RIGHT)) {
 
-            // Set the move right button
+            /**
+             * Set the move right button.
+             */ 
             game.player.move(1, 0, 53);
         }        
+    },
+
+    lose: function () {
+        game.state.start('menu');
+    },
+
+    win: function () {
+        game.state.start('menu');
     }
 }

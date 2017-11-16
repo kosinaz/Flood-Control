@@ -50,6 +50,8 @@ Wave.constructor = Wave;
  */
 Wave.prototype.spread = function () {
 
+  var text, bar;
+
   /**
    * Create a new wave on the top if needed.
    */
@@ -97,6 +99,43 @@ Wave.prototype.spread = function () {
      * Leave the image of a raised water tile behind on non-walled streets.
      */
     this.image.frame = 60;
+
+    /**
+     * If the player's dozer is flooded make the player lose the game.
+     */
+    if (this.x === game.player.x && this.y === game.player.y) {
+      bar = game.add.graphics();
+      bar.beginFill(0xff0000, 0.7);
+      bar.drawRect(0, 200, 1024, 100);
+      text = game.add.text(0, 0, 'Blub-blub-blub', {
+        boundsAlignH: "center", 
+        boundsAlignV: "middle",
+        fill: '#fff',
+        font: 'bold 60pt Arial'
+      });
+      text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
+      text.setTextBounds(0, 200, 1024, 100);
+      game.time.events.add(Phaser.Timer.SECOND * 5, playState.lose, this);
+    }
+
+    /**
+     * If the player's dozer is flooded make the player lose the game.
+     */
+    if (this.x === Math.floor(game.tiledMap.width / 2) && 
+      this.y === game.tiledMap.height - 1) {
+      bar = game.add.graphics();
+      bar.beginFill(0xffff00, 0.7);
+      bar.drawRect(0, 200, 1024, 100);
+      text = game.add.text(0, 0, 'Still dry...', {
+        boundsAlignH: "center",
+        boundsAlignV: "middle",
+        fill: '#fff',
+        font: 'bold 60pt Arial'
+      });
+      text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
+      text.setTextBounds(0, 200, 1024, 100);
+      game.time.events.add(Phaser.Timer.SECOND * 5, playState.win, this);
+    }
   }
 
   /**
