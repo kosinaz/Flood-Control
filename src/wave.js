@@ -119,7 +119,7 @@ Wave.prototype.spread = function () {
     }
 
     /**
-     * If the player's dozer is flooded make the player lose the game.
+     * If the player's dozer is flooded make the player win the game.
      */
     if (this.x === Math.floor(game.tiledMap.width / 2) && 
       this.y === game.tiledMap.height - 1) {
@@ -137,7 +137,7 @@ Wave.prototype.spread = function () {
       game.time.events.add(Phaser.Timer.SECOND * 5, playState.win, this);
     }
   }
-
+  
   /**
    * Hide the wave.
    */
