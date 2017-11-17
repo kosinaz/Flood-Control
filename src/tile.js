@@ -104,7 +104,7 @@ Tile.prototype.getIsoY = function () {
  * passable by the player or not.
  */
 Tile.prototype.isStreet = function () {
-    return this.i > 8 && this.i < 22;
+    return this.i > 7 && this.i < 22;
 }
 
 /**

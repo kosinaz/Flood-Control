@@ -3,11 +3,6 @@ var playState = {
     create: function () {
 
         /**
-         * Set the map.
-         */ 
-        game.tiledMap = game.cache.getJSON('level');
-
-        /**
          * Group the background layer to display everything else above it.
          */ 
         game.background = game.add.group();
