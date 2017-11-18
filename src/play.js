@@ -3,29 +3,34 @@ var playState = {
     create: function () {
 
         /**
+         * Load the map data.
+         */
+        this.tiledMap = game.cache.getJSON('level' + game.currentLevel);
+
+        /**
          * Group the background layer to display everything else above it.
          */ 
-        game.background = game.add.group();
+        this.background = game.add.group();
 
         /**
          * Group the scene to make it depth sortable after each movement.
          */
-        game.scene = game.add.group();
+        this.scene = game.add.group();
 
         /**
          * Store all tiles, houses and actors of the current map.
          */ 
-        game.map = new Map();
+        this.map = new Map();
 
         /**
          * Draw each tile of the background.
          */ 
-        game.tiledMap.layers[0].data.forEach(this.drawBackground, this);
+        this.tiledMap.layers[0].data.forEach(this.drawBackground, this);
 
         /**
          * Draw each tile of the scene.
          */ 
-        game.tiledMap.layers[1].data.forEach(this.drawScene, this);
+        this.tiledMap.layers[1].data.forEach(this.drawScene, this);
 
         /**
          * Delay the flood.
@@ -73,7 +78,7 @@ var playState = {
      * It is used in drawBackground and drawScene.
      */
     iToX: function (i) {
-        return i % game.tiledMap.width;
+        return i % this.tiledMap.width;
     },
 
     /** 
@@ -83,7 +88,7 @@ var playState = {
      * a 1-dimensional array, needs to be displayed in 2-dimensions.
      */
     iToY: function (i) {
-        return Math.floor(i / game.tiledMap.width);
+        return Math.floor(i / this.tiledMap.width);
     },
 
     /**
@@ -132,7 +137,7 @@ var playState = {
         /**
          * Create a wave on each tile of the top of the map.
          */ 
-        for (var i = 0; i < game.tiledMap.width; i += 1) {
+        for (var i = 0; i < this.tiledMap.width; i += 1) {
 
             /**
              * Create the wave.
@@ -152,7 +157,7 @@ var playState = {
         /**
          * Draw the overlapping actors in the correct order.
          */ 
-        game.scene.sort('y', Phaser.Group.SORT_ASCENDING);
+        this.scene.sort('y', Phaser.Group.SORT_ASCENDING);
 
         /**
          * If the player is already moving ignore the input.
@@ -200,10 +205,23 @@ var playState = {
     },
 
     lose: function () {
+
+        /**
+         * Return to the menu.
+         */
         game.state.start('menu');
     },
 
     win: function () {
+
+        /**
+         * Unlock the next level if needed.
+         */
+        game.progress = Math.max(game.progress, game.currentLevel + 1);
+
+        /**
+         * Return to the menu.
+         */
         game.state.start('menu');
     }
 }

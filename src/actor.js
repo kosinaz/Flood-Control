@@ -40,25 +40,25 @@ Actor.prototype.move = function (x, y, i) {
   /**
    * If the destination is not a street ignore the input.
    */ 
-  if (!game.map.getXYZ(dx, dy, 0).isStreet()) {
+  if (!playState.map.getXYZ(dx, dy, 0).isStreet()) {
     return false;
   }
 
   /**
    * If the destination is water ignore the input.
    */
-  if (game.map.XYisWater(dx, dy)) {
+  if (playState.map.XYisWater(dx, dy)) {
     return false;
   }
 
   /**
    * If the destination is a wall and the actor is the player push it.
    */ 
-  if (game.map.getXYZ(dx, dy, 1).isWall()) {
+  if (playState.map.getXYZ(dx, dy, 1).isWall()) {
     if (game.player !== this) {
       return false;
     }
-    if (!game.map.getXYZ(dx, dy, 1).move(x, y)) {
+    if (!playState.map.getXYZ(dx, dy, 1).move(x, y)) {
       return false;
     }
   }
@@ -66,7 +66,7 @@ Actor.prototype.move = function (x, y, i) {
   /**
    * Move the actor to its destination.
    */ 
-  game.map.moveXYZ(this.x, this.y, this.z, dx, dy, this.z);
+  playState.map.moveXYZ(this.x, this.y, this.z, dx, dy, this.z);
   this.x = dx;
   this.y = dy;
 

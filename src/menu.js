@@ -1,89 +1,39 @@
 var menuState = {
     create: function () {
- 
-        /**
-         * Set the background color
-         */ 
-        game.stage.backgroundColor = "#1caeff";
+
+        var positions = game.cache.getJSON('menu');
+
+        var buttons = [], texts = [];
+
         
         /**
-         * Create a button for level 1
+         * Create a button for each level.
          */ 
-        game.add.text(0, 0, '1', {
-            boundsAlignH: "center",
-            boundsAlignV: "middle",
-            fill: '#ff0',
-            font: 'bold 30pt Arial'
-        }).setTextBounds(50, 50, 100, 50);;
-        var level1 = game.add.image(50, 100, 'menu', 1);
-        level1.inputEnabled = true;
-        level1.events.onInputUp.add(function () {
-            game.tiledMap = game.cache.getJSON('level1');
-            game.state.start('play');
-        }, this);
-
-        /**
-         * Create a button for level 2
-         */
-        game.add.text(0, 0, '2', {
-            boundsAlignH: "center",
-            boundsAlignV: "middle",
-            fill: '#ff0',
-            font: 'bold 30pt Arial'
-        }).setTextBounds(100, 150, 100, 50);;
-        var level2 = game.add.image(100, 200, 'menu', 2);
-        level2.inputEnabled = true;
-        level2.events.onInputUp.add(function () {
-            game.tiledMap = game.cache.getJSON('level2');
-            game.state.start('play');
-        }, this);
-
-        /**
-         * Create a button for level 3
-         */
-        game.add.text(0, 0, '3', {
-            boundsAlignH: "center",
-            boundsAlignV: "middle",
-            fill: '#ff0',
-            font: 'bold 30pt Arial'
-        }).setTextBounds(200, 100, 100, 50);;
-        var level3 = game.add.image(200, 150, 'menu', 3);
-        level3.inputEnabled = true;
-        level3.events.onInputUp.add(function () {
-            game.tiledMap = game.cache.getJSON('level3');
-            game.state.start('play');
-        }, this);
-
-        /**
-         * Create a button for level 4
-         */
-        game.add.text(0, 0, '4', {
-            boundsAlignH: "center",
-            boundsAlignV: "middle",
-            fill: '#ff0',
-            font: 'bold 30pt Arial'
-        }).setTextBounds(300, 200, 100, 50);;
-        var level4 = game.add.image(300, 250, 'menu', 4);
-        level4.inputEnabled = true;
-        level4.events.onInputUp.add(function () {
-            game.tiledMap = game.cache.getJSON('level4');
-            game.state.start('play');
-        }, this);
-
-        /**
-         * Create a button for level 5
-         */
-        game.add.text(0, 0, '5', {
-            boundsAlignH: "center",
-            boundsAlignV: "middle",
-            fill: '#ff0',
-            font: 'bold 30pt Arial'
-        }).setTextBounds(350, 100, 100, 50);;
-        var level5 = game.add.image(350, 150, 'menu', 5);
-        level5.inputEnabled = true;
-        level5.events.onInputUp.add(function () {
-            game.tiledMap = game.cache.getJSON('level5');
-            game.state.start('play');
-        }, this);
+        for (var i = 0; i < 5; i += 1) {
+            texts[i] = game.add.text(0, 0, i + 1, {
+                boundsAlignH: "center",
+                boundsAlignV: "middle",
+                fill: '#ff0',
+                font: 'bold 30pt Arial'
+            });
+            texts[i].setTextBounds(positions[i].x, positions[i].y, 100, 50);
+            buttons[i] = game.add.button(
+                positions[i].x, 
+                positions[i].y + 50, 
+                'menu', 
+                function (button) {
+                    game.currentLevel = button.frame + 1;
+                    game.state.start('play');
+                },
+                this
+            );
+            buttons[i].frame = i;
+            if (game.progress < i + 1) {
+                texts[i].fill = '#0005';
+                buttons[i].tint = 0x000000;
+                buttons[i].alpha = 0.3;
+                buttons[i].inputEnabled = false;
+            }
+        }
     }
 };

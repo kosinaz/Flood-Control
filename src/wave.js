@@ -55,43 +55,43 @@ Wave.prototype.spread = function () {
   /**
    * Create a new wave on the top if needed.
    */
-  if (game.map.XYisFloodableVertically(this.x, this.y - 1)) {
+  if (playState.map.XYisFloodableVertically(this.x, this.y - 1)) {
     new Wave(this.x, this.y - 1, 0, -1, 49);
   }
 
   /**
    * Create a new wave on the left if needed.
    */
-  if (game.map.XYisFloodableHorizontally(this.x - 1, this.y)) {
+  if (playState.map.XYisFloodableHorizontally(this.x - 1, this.y)) {
     new Wave(this.x - 1, this.y, -1, 0, 48);
   }
 
   /**
    * Create a new wave on the bottom if needed.
    */
-  if (game.map.XYisFloodableVertically(this.x, this.y + 1)) {
+  if (playState.map.XYisFloodableVertically(this.x, this.y + 1)) {
     new Wave(this.x, this.y + 1, 0, 1, 44);
   }
 
   /**
    * Create a new wave on the right if needed.
    */
-  if (game.map.XYisFloodableHorizontally(this.x + 1, this.y)) {
+  if (playState.map.XYisFloodableHorizontally(this.x + 1, this.y)) {
     new Wave(this.x + 1, this.y, 1, 0, 45);
   }
 
   /**
    * If there is a misplaced wall.
    */
-  if ((game.map.getXYZ(this.x, this.y, 1).i === 32 && 
-    !game.map.getXYZ(this.x, this.y, 1).wallsHorizontally()) ||
-    (game.map.getXYZ(this.x, this.y, 1).i === 33 && 
-    !game.map.getXYZ(this.x, this.y, 1).wallsVertically())) {
+  if ((playState.map.getXYZ(this.x, this.y, 1).i === 32 && 
+    !playState.map.getXYZ(this.x, this.y, 1).wallsHorizontally()) ||
+    (playState.map.getXYZ(this.x, this.y, 1).i === 33 && 
+    !playState.map.getXYZ(this.x, this.y, 1).wallsVertically())) {
 
     /**
      * Set the wall flooded that is not between two houses.
      */
-    game.map.getXYZ(this.x, this.y, 1).image.frame += 4;
+    playState.map.getXYZ(this.x, this.y, 1).image.frame += 4;
 
   } else {
 
@@ -121,8 +121,8 @@ Wave.prototype.spread = function () {
     /**
      * If the player's dozer is flooded make the player win the game.
      */
-    if (this.x === Math.floor(game.tiledMap.width / 2) && 
-      this.y === game.tiledMap.height - 1) {
+    if (this.x === Math.floor(playState.tiledMap.width / 2) && 
+      this.y === playState.tiledMap.height - 1) {
       bar = game.add.graphics();
       bar.beginFill(0xffff00, 0.7);
       bar.drawRect(0, 200, 1024, 100);

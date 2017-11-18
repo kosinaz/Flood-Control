@@ -40,7 +40,7 @@ var Tile = function (x, y, z, i) {
      * for z = 0, and scene for z = 1 like the walls and the dozer and z = 2
      * like the water.
      */
-    this.layer = z ? game.scene : game.background;
+    this.layer = z ? playState.scene : playState.background;
 
     /**
      * @property {Phaser.Image} image - The image of the tile.
@@ -50,7 +50,7 @@ var Tile = function (x, y, z, i) {
     /**
      * Add the Tile to the game map.
      */
-    game.map.setXYZ(x, y, z, this); 
+    playState.map.setXYZ(x, y, z, this); 
 
 }
 
@@ -80,9 +80,9 @@ Tile.prototype.addImage = function () {
  * displayed in isometric 2-dimensions.
  */
 Tile.prototype.getIsoX = function () {
-    return (this.x - this.y) * game.tiledMap.tilewidth / 2 + 
-        game.tiledMap.tilewidth / 2 * game.tiledMap.width / 2 - 
-        game.tiledMap.tilewidth;
+    return (this.x - this.y) * playState.tiledMap.tilewidth / 2 + 
+        playState.tiledMap.tilewidth / 2 * playState.tiledMap.width / 2 - 
+        playState.tiledMap.tilewidth;
 }
 
 /** 
@@ -93,9 +93,9 @@ Tile.prototype.getIsoX = function () {
  * displayed in isometric 2-dimensions.
  */
 Tile.prototype.getIsoY = function () {
-    return (this.x + this.y) * game.tiledMap.tileheight / 2 - 
-        game.tiledMap.tileheight / 2 * game.tiledMap.height / 2 - 
-        game.tiledMap.tileheight / 2;
+    return (this.x + this.y) * playState.tiledMap.tileheight / 2 - 
+        playState.tiledMap.tileheight / 2 * playState.tiledMap.height / 2 - 
+        playState.tiledMap.tileheight / 2;
 }
 
 /**
@@ -122,8 +122,9 @@ Tile.prototype.isWall = function () {
  * floodable or not.
  */
 Tile.prototype.wallsHorizontally = function () {
-    return this.i === 32 && game.map.getXYZ(this.x - 1, this.y, 1).isHouse() && 
-        game.map.getXYZ(this.x + 1, this.y, 1).isHouse();
+    return this.i === 32 && 
+        playState.map.getXYZ(this.x - 1, this.y, 1).isHouse() && 
+        playState.map.getXYZ(this.x + 1, this.y, 1).isHouse();
 }
 
 /**
@@ -132,8 +133,9 @@ Tile.prototype.wallsHorizontally = function () {
  * floodable or not.
  */
 Tile.prototype.wallsVertically = function () {
-    return this.i === 33 && game.map.getXYZ(this.x, this.y - 1, 1).isHouse() &&
-        game.map.getXYZ(this.x, this.y + 1, 1).isHouse();
+    return this.i === 33 && 
+        playState.map.getXYZ(this.x, this.y - 1, 1).isHouse() &&
+        playState.map.getXYZ(this.x, this.y + 1, 1).isHouse();
 }
 
 /**

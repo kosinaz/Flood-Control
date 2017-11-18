@@ -1,11 +1,16 @@
 var loadState = {
     preload: function () {
 
-        // Load the tileset
+        /**
+         * Load the images.
+         */ 
         game.load.spritesheet('tileset', 'assets/tileset.png', 96, 96);
         game.load.spritesheet('menu', 'assets/menu.png', 100, 50);
 
-        // Load the level data
+        /**
+         * Load the menu layout and level data.
+         */ 
+        game.load.json('menu', 'data/menu.json');
         game.load.json('level', 'data/level.json');
         game.load.json('level1', 'data/level1.json');
         game.load.json('level2', 'data/level2.json');
@@ -13,18 +18,26 @@ var loadState = {
         game.load.json('level4', 'data/level4.json');
         game.load.json('level5', 'data/level5.json');
 
-        // Load the music
+        /**
+         * Load the music.
+         */
         game.load.audio('music', 'assets/revolutionary.mp3');
     },
     create: function () {
 
-        // Start music
+        /**
+         * Start the music.
+         */
         game.add.audio('music', 0.3, true).play();
 
-        // Start the game
-        game.state.start('menu');
+        /**
+         * Set the background color.
+         */
+        game.stage.backgroundColor = "#1caeff";
 
-        // Set the number of unlocked levels
-        game.progress = 1;
+        /**
+         * Open the level selection menu.
+         */
+        game.state.start('menu');
     }
 };
