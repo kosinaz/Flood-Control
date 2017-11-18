@@ -68,12 +68,13 @@ var playState = {
         this.backButton.events.onInputUp.add(this.lose, this);
 
         /**
-         * Set the sound button.
+         * Set the mute button.
          */
         this.muteButton = game.add.text(904, 20, '🕪', {
             font: 'bold 30pt Arial',
             fill: '#fff'
         });
+        this.muteButton.text = game.music.mute ? '🕨' : '🕪';
         this.muteButton.inputEnabled = true;
         this.muteButton.events.onInputUp.add(this.mute, this);
     },

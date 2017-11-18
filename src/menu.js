@@ -19,6 +19,17 @@ var menuState = {
         graphics.endFill();
 
         /**
+         * Set the mute button.
+         */
+        this.muteButton = game.add.text(904, 20, '🕪', {
+            font: 'bold 30pt Arial',
+            fill: '#fff'
+        });
+        this.muteButton.text = game.music.mute ? '🕨' : '🕪';
+        this.muteButton.inputEnabled = true;
+        this.muteButton.events.onInputUp.add(this.mute, this);
+
+        /**
          * Create a button for each level.
          */ 
         for (i = 0; i < 5; i += 1) {
@@ -75,5 +86,10 @@ var menuState = {
                 buttons[i].inputEnabled = false;
             }
         }
-    }
+    },
+
+    mute: function () {
+        game.music.mute = !game.music.mute;
+        this.muteButton.text = game.music.mute ? '🕨' : '🕪';
+    },
 };
