@@ -3,6 +3,7 @@ var loadState = {
 
         // Load the tileset
         game.load.spritesheet('tileset', 'assets/tileset.png', 96, 96);
+        game.load.spritesheet('menu', 'assets/menu.png', 100, 50);
 
         // Load the level data
         game.load.json('level', 'data/level.json');
@@ -22,5 +23,8 @@ var loadState = {
 
         // Start the game
         game.state.start('menu');
+
+        // Set the number of unlocked levels
+        game.progress = 1;
     }
 };
