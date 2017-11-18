@@ -28,12 +28,12 @@ var loadState = {
         /**
          * Start the music.
          */
-        game.add.audio('music', 0.3, true).play();
+        game.music = game.add.audio('music', 0.3, true).play();
 
         /**
          * Set the background color.
          */
-        game.stage.backgroundColor = "#1caeff";
+        game.stage.backgroundColor = "#147ab3";
 
         /**
          * Open the level selection menu.

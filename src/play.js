@@ -42,7 +42,7 @@ var playState = {
         /**
          * Set the timer text.
          */
-        this.timerLabel = game.add.text(40, 40, '0:00', {
+        this.timerLabel = game.add.text(20, 20, '0:00', {
             font: 'bold 30pt Arial',
             fill: '#fff'
         });
@@ -50,12 +50,32 @@ var playState = {
         /**
          * Set the fast forward button.
          */
-        this.skipButton = game.add.text(130, 40, '⏩', {
+        this.skipButton = game.add.text(110, 20, '⏭', {
             font: 'bold 30pt Arial',
-            fill: '#f00'
+            fill: '#fff'
         });
         this.skipButton.inputEnabled = true;
         this.skipButton.events.onInputUp.add(this.skip, this);
+
+        /**
+         * Set the back button.
+         */
+        this.backButton = game.add.text(964, 20, '⏎', {
+            font: 'bold 30pt Arial',
+            fill: '#fff'
+        });
+        this.backButton.inputEnabled = true;
+        this.backButton.events.onInputUp.add(this.lose, this);
+
+        /**
+         * Set the sound button.
+         */
+        this.muteButton = game.add.text(904, 20, '🕪', {
+            font: 'bold 30pt Arial',
+            fill: '#fff'
+        });
+        this.muteButton.inputEnabled = true;
+        this.muteButton.events.onInputUp.add(this.mute, this);
     },
 
     /**
@@ -202,6 +222,11 @@ var playState = {
     skip: function () {
         this.timer.stop(true);
         this.startFlood();
+    },
+
+    mute: function () {
+        game.music.mute = !game.music.mute;
+        this.muteButton.text = game.music.mute ? '🕨' : '🕪';
     },
 
     lose: function () {
