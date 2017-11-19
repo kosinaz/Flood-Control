@@ -3,6 +3,18 @@ var playState = {
     create: function () {
 
         /**
+         * Set controls.
+         */
+        this.keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
+        this.keyS = game.input.keyboard.addKey(Phaser.Keyboard.S);
+        this.keyA = game.input.keyboard.addKey(Phaser.Keyboard.A);
+        this.keyD = game.input.keyboard.addKey(Phaser.Keyboard.D);
+        this.keyUp = game.input.keyboard.addKey(Phaser.Keyboard.UP);
+        this.keyDown = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+        this.keyLeft = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+        this.keyRight = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+
+        /**
          * Load the map data.
          */
         this.tiledMap = game.cache.getJSON('level' + game.currentLevel);
@@ -192,28 +204,30 @@ var playState = {
         /**
          * Set the movement buttons.
          */ 
-        if (game.input.keyboard.isDown(Phaser.KeyCode.UP)) {
+        
+
+        if (this.keyW.isDown || this.keyUp.isDown) {
 
             /**
              * Set the move up button.
              */ 
             game.player.move(0, -1, 54);
 
-        } else if (game.input.keyboard.isDown(Phaser.KeyCode.DOWN)) {
+        } else if (this.keyS.isDown || this.keyDown.isDown) {
 
             /**
              * Set the move down button.
              */ 
             game.player.move(0, 1, 52);
 
-        } else if (game.input.keyboard.isDown(Phaser.KeyCode.LEFT)) {
+        } else if (this.keyA.isDown || this.keyLeft.isDown) {
 
             /**
              * Set the move left button.
              */ 
             game.player.move(-1, 0, 55);
 
-        } else if (game.input.keyboard.isDown(Phaser.KeyCode.RIGHT)) {
+        } else if (this.keyD.isDown || this.keyRight.isDown) {
 
             /**
              * Set the move right button.
@@ -251,5 +265,9 @@ var playState = {
          * Return to the menu.
          */
         game.state.start('menu');
+    },
+
+    moveUp: function () {
+        game.player.move(0, -1, 54);
     }
 }
