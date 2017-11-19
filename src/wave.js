@@ -119,22 +119,37 @@ Wave.prototype.spread = function () {
     }
 
     /**
-     * If the player's dozer is flooded make the player win the game.
+     * If the player's dozer is not flooded make the player win the game.
      */
     if (this.x === Math.floor(playState.tiledMap.width / 2) && 
       this.y === playState.tiledMap.height - 1) {
-      bar = game.add.graphics();
-      bar.beginFill(0xffff00, 0.7);
-      bar.drawRect(0, 200, 1024, 100);
-      text = game.add.text(0, 0, 'Still dry...', {
-        boundsAlignH: "center",
-        boundsAlignV: "middle",
-        fill: '#fff',
-        font: 'bold 60pt Arial'
-      });
-      text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
-      text.setTextBounds(0, 200, 1024, 100);
-      game.time.events.add(Phaser.Timer.SECOND * 5, playState.win, this);
+      if (game.progress === 20) {
+        bar = game.add.graphics();
+        bar.beginFill(0x00ff00, 0.7);
+        bar.drawRect(0, 200, 1024, 100);
+        text = game.add.text(0, 0, 'To be continued...', {
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+          fill: '#fff',
+          font: 'bold 60pt Arial'
+        });
+        text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
+        text.setTextBounds(0, 200, 1024, 100);
+        game.time.events.add(Phaser.Timer.SECOND * 5, playState.win, this);
+      } else {
+        bar = game.add.graphics();
+        bar.beginFill(0xffff00, 0.7);
+        bar.drawRect(0, 200, 1024, 100);
+        text = game.add.text(0, 0, 'Still dry...', {
+          boundsAlignH: "center",
+          boundsAlignV: "middle",
+          fill: '#fff',
+          font: 'bold 60pt Arial'
+        });
+        text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
+        text.setTextBounds(0, 200, 1024, 100);
+        game.time.events.add(Phaser.Timer.SECOND * 5, playState.win, this);
+      }
     }
   }
   

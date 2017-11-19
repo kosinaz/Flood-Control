@@ -36,7 +36,8 @@ var playState = {
          * Delay the flood.
          */
         this.timer = game.time.create(false),
-        this.timer.add(Phaser.Timer.SECOND * 59, this.startFlood, this);
+        this.timer.add(Phaser.Timer.SECOND * game.currentLevel * 6, 
+            this.startFlood, this);
         this.timer.start();
 
         /**
@@ -170,10 +171,11 @@ var playState = {
     update: function () {
 
         /**
-         * Update the seconds left until the flood.
+         * Update the time left until the flood.
          */
-        var seconds = Math.ceil(this.timer.duration / 1000);
-        this.timerLabel.text = '0:' + (seconds < 10 ? '0' : '') + seconds;
+        var time = Math.ceil(this.timer.duration / 1000);
+        this.timerLabel.text = Math.floor (time / 60) + ':' 
+            + (time % 60 < 10 ? '0' : '') + time % 60;
 
         /**
          * Draw the overlapping actors in the correct order.

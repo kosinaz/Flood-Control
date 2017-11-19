@@ -6,15 +6,10 @@
 
 A real-time puzzle game, in which your goal is to save certain areas from the endless flood with your mighty bulldozer pushing flood barriers to the right places.
 
-You have 1 minute to make a completely sealed down area that cannot be reached by the flooding water after the time is up.
+You have a very limited amount of time to make a completely sealed down area that cannot be reached by the flooding water.
+Your bulldozer have to be inside the sealed down area and survive the flood to unlock the next level.
 
-You will get:
-* 10 points for every dry street
-* 1 point for every unused second after the last barrier is in place
-
-The bulldozer have to be inside the sealed down area and survive to unlock the next level.
-
-You have to prove your skills through several levels with increasing number of barriers scattered accross the city.
+You have to prove your skills through 20 levels with increasing number of barriers scattered accross the city.
 
 Be quick, be efficient, and control the flood!
 

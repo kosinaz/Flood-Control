@@ -11,13 +11,8 @@ var menuState = {
             positions = game.cache.getJSON('menu'),
             texts = [];
 
-        /**
-         * Draw the already explored area.
-         */
-        graphics.beginFill(0x1caeff);
-        graphics.drawCircle(200, 100, 600);
-        graphics.endFill();
 
+        game.add.image(162, 25, 'title');
         /**
          * Set the mute button.
          */
@@ -32,7 +27,7 @@ var menuState = {
         /**
          * Create a button for each level.
          */ 
-        for (i = 0; i < 5; i += 1) {
+        for (i = 0; i < positions.length; i += 1) {
 
             /**
              * Write the label of the button above the button.
@@ -57,7 +52,7 @@ var menuState = {
                     /**
                      * Set the level to be started by the button.
                      */
-                    game.currentLevel = button.frame + 1;
+                    game.currentLevel = button.data + 1;
 
                     /**
                      * Start the level.
@@ -67,6 +62,7 @@ var menuState = {
                 this
             );
             buttons[i].frame = i;
+            buttons[i].data = i;
 
             /**
              * If the level is not unlocked disable the button.

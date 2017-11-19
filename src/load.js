@@ -6,17 +6,33 @@ var loadState = {
          */ 
         game.load.spritesheet('tileset', 'assets/tileset.png', 96, 96);
         game.load.spritesheet('menu', 'assets/menu.png', 100, 50);
+        game.load.image('title', 'assets/title.png');
 
         /**
          * Load the menu layout and level data.
          */ 
         game.load.json('menu', 'data/menu.json');
-        game.load.json('level', 'data/level.json');
         game.load.json('level1', 'data/level1.json');
         game.load.json('level2', 'data/level2.json');
         game.load.json('level3', 'data/level3.json');
         game.load.json('level4', 'data/level4.json');
         game.load.json('level5', 'data/level5.json');
+        game.load.json('level6', 'data/level6.json');
+        game.load.json('level7', 'data/level7.json');
+        game.load.json('level8', 'data/level8.json');
+        game.load.json('level9', 'data/level9.json');
+        game.load.json('level10', 'data/level10.json');
+        game.load.json('level11', 'data/level11.json');
+        game.load.json('level12', 'data/level12.json');
+        game.load.json('level13', 'data/level13.json');
+        game.load.json('level14', 'data/level14.json');
+        game.load.json('level15', 'data/level15.json');
+        game.load.json('level16', 'data/level16.json');
+        game.load.json('level17', 'data/level17.json');
+        game.load.json('level18', 'data/level18.json');
+        game.load.json('level19', 'data/level19.json');
+        game.load.json('level20', 'data/level20.json');
+        game.load.json('level11', 'data/level11.json');
 
         /**
          * Load the music.
@@ -33,7 +49,7 @@ var loadState = {
         /**
          * Set the background color.
          */
-        game.stage.backgroundColor = "#147ab3";
+        game.stage.backgroundColor = "#0084c8";
 
         /**
          * Open the level selection menu.
