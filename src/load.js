@@ -32,12 +32,15 @@ var loadState = {
         game.load.json('level18', 'data/level18.json');
         game.load.json('level19', 'data/level19.json');
         game.load.json('level20', 'data/level20.json');
-        game.load.json('level11', 'data/level11.json');
 
         /**
          * Load the music.
          */
-        game.load.audio('music', 'assets/revolutionary.mp3');
+        game.load.audio('music', [
+            'assets/revolutionary.mp3',
+            'assets/revolutionary.ogg',
+            'assets/revolutionary.m4a'
+        ]);
     },
     create: function () {
 
