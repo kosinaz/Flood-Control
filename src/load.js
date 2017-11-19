@@ -37,7 +37,7 @@ var loadState = {
          * Load the music.
          */
         game.load.audio('music', [
-            'assets/revolutionary.mp3',
+            //'assets/revolutionary.mp3',
             'assets/revolutionary.ogg',
             'assets/revolutionary.m4a'
         ]);
