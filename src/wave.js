@@ -135,11 +135,11 @@ Wave.prototype.spread = function () {
         });
         text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
         text.setTextBounds(0, 200, 1024, 100);
-        game.time.events.add(Phaser.Timer.SECOND * 5, playState.win, this);
+        game.time.events.add(Phaser.Timer.SECOND * 5, playState.win, playState);
       } else {
         bar = game.add.graphics();
         bar.beginFill(0xffff00, 0.7);
-        bar.drawRect(0, 200, 1024, 100);
+        bar.drawRect(0, 200, 1024, 200);
         text = game.add.text(0, 0, 'Still dry...', {
           boundsAlignH: "center",
           boundsAlignV: "middle",
@@ -148,7 +148,22 @@ Wave.prototype.spread = function () {
         });
         text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
         text.setTextBounds(0, 200, 1024, 100);
-        game.time.events.add(Phaser.Timer.SECOND * 5, playState.win, this);
+        time = game.add.text(
+          0, 
+          0, 
+          'Time spent: ' + Math.floor(playState.lastMovement / 60) + ':' +
+          (playState.lastMovement % 60 < 10 ? '0' : '') +
+          playState.lastMovement % 60, 
+          {
+            boundsAlignH: "center",
+            boundsAlignV: "middle",
+            fill: '#fff',
+            font: 'bold 60pt Arial'
+          }
+        );
+        time.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
+        time.setTextBounds(0, 300, 1024, 100);
+        game.time.events.add(Phaser.Timer.SECOND * 5, playState.win, playState);
       }
     }
   }

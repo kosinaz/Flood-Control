@@ -55,7 +55,7 @@ Actor.prototype.move = function (x, y, i) {
    * If the destination is a wall and the actor is the player push it.
    */ 
   if (playState.map.getXYZ(dx, dy, 1).isWall()) {
-    if (game.player !== this) {
+    if (this.isWall()) {
       return false;
     }
     if (!playState.map.getXYZ(dx, dy, 1).move(x, y)) {
@@ -82,6 +82,13 @@ Actor.prototype.move = function (x, y, i) {
     x: this.getIsoX(),
     y: this.getIsoY()
   }, 200, Phaser.Easing.None, true);
+
+  /**
+   * Save the time of the last movement of a wall.
+   */
+  if (this.isWall()) {
+    playState.lastMovement = Math.ceil(playState.timer.ms / 1000);
+  }
 
   /**
    * Return the movement as successful.

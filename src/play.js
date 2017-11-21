@@ -50,6 +50,7 @@ var playState = {
         this.timer = game.time.create(false),
         this.timer.add(Phaser.Timer.SECOND * game.currentLevel * 6, 
             this.startFlood, this);
+        this.lastMovement = 0;
         this.timer.start();
 
         /**
@@ -257,14 +258,58 @@ var playState = {
     win: function () {
 
         /**
+         * Save the best time.
+         */
+        GJAPI.ScoreAdd(
+            (game.currentLevel - 1 ? 1 : 0) + game.currentLevel + 303221, 
+            this.lastMovement, 
+            Math.floor(this.lastMovement / 60) + ':' + 
+                (this.lastMovement % 60 < 10 ? '0' : '') + 
+                this.lastMovement % 60
+        );
+
+        game.totalTime = 0;
+        game.nextTime = 303223;
+        GJAPI.ScoreFetch(303222, GJAPI.SCORE_ONLY_USER, 1, this.fetchScores);
+
+        /**
          * Unlock the next level if needed.
          */
         game.progress = Math.max(game.progress, game.currentLevel + 1);
 
         /**
+         * Save the progress.
+         */
+        GJAPI.DataStoreSet(GJAPI.DATA_STORE_USER, "progress", game.progress);
+
+        /**
          * Return to the menu.
          */
         game.state.start('menu');
+    },
+
+    fetchScores: function (pResponse) {
+        if (!pResponse.scores) return;
+        game.nextTime += 1;
+        if (game.nextTime > 303242) {
+            /**
+             * Save the best total time.
+             */
+            GJAPI.ScoreAdd(
+                0,
+                game.totalTime,
+                Math.floor(game.totalTime / 60) + ':' +
+                (game.totalTime % 60 < 10 ? '0' : '') +
+                game.totalTime % 60
+            );
+        };
+        game.totalTime += parseInt(pResponse.scores[0].sort, 10);
+        GJAPI.ScoreFetch(
+            game.nextTime, 
+            GJAPI.SCORE_ONLY_USER, 
+            1, 
+            playState.fetchScores
+        );
     },
 
     moveUp: function () {

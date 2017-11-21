@@ -55,8 +55,21 @@ var loadState = {
         game.stage.backgroundColor = "#0084c8";
 
         /**
-         * Open the level selection menu.
+         * Load the player's progress.
          */
-        game.state.start('menu');
+        GJAPI.DataStoreFetch(
+            GJAPI.DATA_STORE_USER, 
+            "progress", 
+            function (pResponse) {
+                if (pResponse.success) {
+                    game.progress = pResponse.data;
+                }
+                
+                /**
+                 * Open the level selection menu.
+                 */
+                game.state.start('menu');
+            }
+        );
     }
 };
