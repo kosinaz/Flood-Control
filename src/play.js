@@ -35,6 +35,16 @@ var playState = {
         this.map = new Map();
 
         /**
+         * Set the initial speed of the waves.
+         */
+        this.wavespeed = 1000;
+
+        /**
+         * Set the losing flag.
+         */
+        this.losing = false;
+
+        /**
          * Draw each tile of the background.
          */ 
         this.tiledMap.layers[0].data.forEach(this.drawBackground, this);
@@ -91,6 +101,16 @@ var playState = {
         this.muteButton.text = game.music.mute ? '🕨' : '🕪';
         this.muteButton.inputEnabled = true;
         this.muteButton.events.onInputUp.add(this.mute, this);
+
+        /**
+         * Set the restart button.
+         */
+        this.restartButton = game.add.text(844, 20, '⟳', {
+            font: 'bold 30pt Arial',
+            fill: '#fff'
+        });
+        this.restartButton.inputEnabled = true;
+        this.restartButton.events.onInputUp.add(this.restart, this);
     },
 
     /**
@@ -239,6 +259,7 @@ var playState = {
 
     skip: function () {
         this.timer.stop(true);
+        this.wavespeed = 100;
         this.startFlood();
     },
 
@@ -253,6 +274,14 @@ var playState = {
          * Return to the menu.
          */
         game.state.start('menu');
+    },
+
+    restart: function () {
+
+        /**
+         * Return to the menu.
+         */
+        game.state.start('play');
     },
 
     win: function () {

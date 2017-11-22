@@ -34,12 +34,12 @@ var Wave = function (x, y, xd, yd, i) {
   game.add.tween(this.animation.image).to({
     x: this.animation.getIsoX(),
     y: this.animation.getIsoY()
-  }, Phaser.Timer.SECOND * 1, Phaser.Easing.None, true);
+  }, playState.wavespeed, Phaser.Easing.None, true);
 
   /**
    * Spread the water.
    */
-  game.time.events.add(Phaser.Timer.SECOND * 1, this.spread, this);
+  game.time.events.add(playState.wavespeed, this.spread, this);
 
 }
 Wave.prototype = Object.create(Actor.prototype);
@@ -116,13 +116,14 @@ Wave.prototype.spread = function () {
       text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
       text.setTextBounds(0, 200, 1024, 100);
       game.time.events.add(Phaser.Timer.SECOND * 5, playState.lose, this);
+      playState.losing = true;
     }
 
     /**
      * If the player's dozer is not flooded make the player win the game.
      */
     if (this.x === Math.floor(playState.tiledMap.width / 2) && 
-      this.y === playState.tiledMap.height - 1) {
+      this.y === playState.tiledMap.height - 1 && !playState.losing) {
       if (game.progress === 20) {
         bar = game.add.graphics();
         bar.beginFill(0x00ff00, 0.7);
