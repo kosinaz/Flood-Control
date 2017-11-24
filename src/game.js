@@ -20,3 +20,8 @@ game.currentLevel = 0;
  * Store the last unlocked level.
  */ 
 game.progress = 1;
+
+/**
+ * Store the best time of the player on each level.
+ */
+game.times = [];

@@ -13,6 +13,9 @@ var playState = {
         this.keyDown = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
         this.keyLeft = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
         this.keyRight = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+        this.keyHome = game.input.keyboard.addKey(Phaser.Keyboard.HOME);
+        this.keyEnd = game.input.keyboard.addKey(Phaser.Keyboard.END);
+        this.keyEsc = game.input.keyboard.addKey(Phaser.Keyboard.ESC);
 
         /**
          * Load the map data.
@@ -223,38 +226,58 @@ var playState = {
         }
 
         /**
-         * Set the movement buttons.
+         * Set the movement keys.
          */ 
-        
 
         if (this.keyW.isDown || this.keyUp.isDown) {
 
             /**
-             * Set the move up button.
+             * Set the move up key.
              */ 
             game.player.move(0, -1, 54);
 
         } else if (this.keyS.isDown || this.keyDown.isDown) {
 
             /**
-             * Set the move down button.
+             * Set the move down key.
              */ 
             game.player.move(0, 1, 52);
 
         } else if (this.keyA.isDown || this.keyLeft.isDown) {
 
             /**
-             * Set the move left button.
+             * Set the move left key.
              */ 
             game.player.move(-1, 0, 55);
 
         } else if (this.keyD.isDown || this.keyRight.isDown) {
 
             /**
-             * Set the move right button.
+             * Set the move right key.
              */ 
             game.player.move(1, 0, 53);
         }        
+
+        /**
+         * Set the restart key.
+         */
+        if (this.keyHome.isDown) {
+            this.restart();
+        }
+
+        /**
+         * Set the forward key.
+         */
+        if (this.keyEnd.isDown) {
+            this.skip();
+        }
+
+        /**
+         * Set the back key.
+         */
+        if (this.keyEsc.isDown) {
+            this.lose();
+        }
     },
 
     skip: function () {
@@ -273,6 +296,7 @@ var playState = {
         /**
          * Return to the menu.
          */
+        game.currentLevel -= 1;
         game.state.start('menu');
     },
 
@@ -289,17 +313,26 @@ var playState = {
         /**
          * Save the best time.
          */
-        GJAPI.ScoreAdd(
-            (game.currentLevel - 1 ? 1 : 0) + game.currentLevel + 303221, 
-            this.lastMovement, 
-            Math.floor(this.lastMovement / 60) + ':' + 
-                (this.lastMovement % 60 < 10 ? '0' : '') + 
-                this.lastMovement % 60
-        );
+        if (GJAPI.bActive) {
+            GJAPI.ScoreAdd(
+                (game.currentLevel - 1 ? 1 : 0) + game.currentLevel + 303221, 
+                this.lastMovement, 
+                Math.floor(this.lastMovement / 60) + ':' + 
+                    (this.lastMovement % 60 < 10 ? '0' : '') + 
+                    this.lastMovement % 60,
+                game.currentLevel, 
+                this.updateTimes
+            );
+        }
 
-        game.totalTime = 0;
-        game.nextTime = 303223;
-        GJAPI.ScoreFetch(303222, GJAPI.SCORE_ONLY_USER, 1, this.fetchScores);
+        if (game.progress > 20) {
+            game.totalTime = {
+                int: 0,
+                string: '0:00'
+            };
+            game.times.forEach(this.sumTimes, this);
+            GJAPI.ScoreFetch(0, GJAPI.SCORE_ONLY_USER, 1, this.updateTotal);
+        }
 
         /**
          * Unlock the next level if needed.
@@ -309,7 +342,13 @@ var playState = {
         /**
          * Save the progress.
          */
-        GJAPI.DataStoreSet(GJAPI.DATA_STORE_USER, "progress", game.progress);
+        if (GJAPI.bActive) {
+            GJAPI.DataStoreSet(
+                GJAPI.DATA_STORE_USER,
+                "progress",
+                game.progress
+            );
+        }
 
         /**
          * Return to the menu.
@@ -317,31 +356,38 @@ var playState = {
         game.state.start('menu');
     },
 
-    fetchScores: function (pResponse) {
-        if (!pResponse.scores) return;
-        game.nextTime += 1;
-        if (game.nextTime > 303242) {
-            /**
-             * Save the best total time.
-             */
-            GJAPI.ScoreAdd(
-                0,
-                game.totalTime,
-                Math.floor(game.totalTime / 60) + ':' +
-                (game.totalTime % 60 < 10 ? '0' : '') +
-                game.totalTime % 60
-            );
-        };
-        game.totalTime += parseInt(pResponse.scores[0].sort, 10);
-        GJAPI.ScoreFetch(
-            game.nextTime, 
-            GJAPI.SCORE_ONLY_USER, 
-            1, 
-            playState.fetchScores
-        );
+    updateTimes: function () {
+        game.cache.getJSON('levels').forEach(playState.loadTimes, playState);
     },
 
-    moveUp: function () {
-        game.player.move(0, -1, 54);
+    loadTimes: function (level) {
+        GJAPI.ScoreFetch(level.score, GJAPI.SCORE_ONLY_USER, 1, this.loadTime);
+    },
+
+    loadTime: function (response) {
+        if (!response.success) {
+            return;
+        }
+        var i = parseInt(response.scores[0].extra_data, 10) - 1;
+        game.times[i] = {
+            string: response.scores[0].score,
+            int: parseInt(response.scores[0].sort, 10)
+        };
+    },
+
+    sumTimes: function (time) {
+        game.totalTime.int += time.int;
+    },
+
+    updateTotal: function (response) {
+        if (response.success) {
+            if (game.totalTime.int < parseInt(response.scores[0].sort, 10)) {
+               return;
+            }
+        } 
+        game.totalTime.string = Math.floor(game.totalTime.int / 60) + ':' + 
+            (game.totalTime.int % 60 < 10 ? '0' : '') +
+            game.totalTime.int % 60;
+        GJAPI.ScoreAdd(0, game.totalTime.int, game.totalTime.string);
     }
 }

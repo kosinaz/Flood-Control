@@ -11,7 +11,7 @@ var loadState = {
         /**
          * Load the menu layout and level data.
          */ 
-        game.load.json('menu', 'data/menu.json');
+        game.load.json('levels', 'data/levels.json');
         game.load.json('level1', 'data/level1.json');
         game.load.json('level2', 'data/level2.json');
         game.load.json('level3', 'data/level3.json');
@@ -42,6 +42,7 @@ var loadState = {
             'assets/revolutionary.m4a'
         ]);
     },
+    
     create: function () {
 
         /**
@@ -54,22 +55,58 @@ var loadState = {
          */
         game.stage.backgroundColor = "#0084c8";
 
-        /**
-         * Load the player's progress.
-         */
-        GJAPI.DataStoreFetch(
-            GJAPI.DATA_STORE_USER, 
-            "progress", 
-            function (pResponse) {
-                if (pResponse.success) {
-                    game.progress = pResponse.data;
+        if (GJAPI.bActive) {
+
+            /**
+             * Load the player's progress.
+             */
+            GJAPI.DataStoreFetch(
+                GJAPI.DATA_STORE_USER, 
+                "progress", 
+                function (pResponse) {
+                    if (pResponse.success) {
+                        game.progress = pResponse.data;
+                    }
+                    
+                    /**
+                     * Open the level selection menu.
+                     */
+                    game.state.start('menu');
                 }
-                
-                /**
-                 * Open the level selection menu.
-                 */
-                game.state.start('menu');
-            }
-        );
+            );
+ 
+            game.cache.getJSON('levels').forEach(this.loadTimes, this);
+            GJAPI.ScoreFetch(0, GJAPI.SCORE_ONLY_USER, 1, this.loadTotal);
+
+        } else {
+
+            game.state.start('menu');
+        }
+    },
+
+    loadTimes: function (level) {
+        GJAPI.ScoreFetch(level.score, GJAPI.SCORE_ONLY_USER, 1, this.loadTime);
+    },
+
+    loadTime: function (response) {
+        if (!response.success) {
+            return;
+        }
+        var i = parseInt(response.scores[0].extra_data, 10) - 1;
+        game.times[i] = {
+            string: response.scores[0].score,
+            int: parseInt(response.scores[0].sort, 10)
+        };
+    },
+
+    loadTotal: function (response) {
+        if (!response.success) {
+            return;
+        }
+        game.totalTime = {
+            int: parseInt(response.scores[0].sort, 10),
+            string: response.scores[0].score
+        }
+       
     }
 };
