@@ -8,6 +8,7 @@ var menuState = {
         this.keyLeft = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
         this.keyRight = game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
         this.keyEnter = game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+        this.keyM = game.input.keyboard.addKey(Phaser.Keyboard.M);
 
         game.add.image(162, 25, 'title');
 
@@ -147,6 +148,13 @@ var menuState = {
         if (game.currentLevel < 20) {
             this.dozer.x = this.buttons[game.currentLevel].x + 12;
             this.dozer.y = this.buttons[game.currentLevel].y - 22;
+        }        
+        
+        /**
+         * Set the mute key.
+         */
+        if (this.keyM.justDown) {
+            this.mute();
         }
     },
 
