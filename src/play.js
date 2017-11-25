@@ -9,6 +9,7 @@ var playState = {
         this.keyS = game.input.keyboard.addKey(Phaser.Keyboard.S);
         this.keyA = game.input.keyboard.addKey(Phaser.Keyboard.A);
         this.keyD = game.input.keyboard.addKey(Phaser.Keyboard.D);
+        this.keyM = game.input.keyboard.addKey(Phaser.Keyboard.M);
         this.keyUp = game.input.keyboard.addKey(Phaser.Keyboard.UP);
         this.keyDown = game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
         this.keyLeft = game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
@@ -114,6 +115,11 @@ var playState = {
         });
         this.restartButton.inputEnabled = true;
         this.restartButton.events.onInputUp.add(this.restart, this);
+
+        game.add.text(25, 525, '↑ ← ↓ → W A S D', {
+            font: 'bold 14pt Arial',
+            fill: '#fff'
+        });
     },
 
     /**
@@ -261,22 +267,29 @@ var playState = {
         /**
          * Set the restart key.
          */
-        if (this.keyHome.isDown) {
+        if (this.keyHome.justDown) {
             this.restart();
         }
 
         /**
          * Set the forward key.
          */
-        if (this.keyEnd.isDown) {
+        if (this.keyEnd.justDown) {
             this.skip();
         }
 
         /**
          * Set the back key.
          */
-        if (this.keyEsc.isDown) {
+        if (this.keyEsc.justDown) {
             this.lose();
+        }
+
+        /**
+         * Set the mute key.
+         */
+        if (this.keyM.justDown) {
+            this.mute();
         }
     },
 
@@ -320,10 +333,17 @@ var playState = {
                 Math.floor(this.lastMovement / 60) + ':' + 
                     (this.lastMovement % 60 < 10 ? '0' : '') + 
                     this.lastMovement % 60,
-                game.currentLevel, 
-                this.updateTimes
+                game.currentLevel
             );
         }
+        game.times[game.currentLevel - 1].int = Math.min(
+            this.lastMovement, 
+            game.times[game.currentLevel - 1].int
+        );
+        game.times[game.currentLevel - 1].string = 
+            Math.floor(game.times[game.currentLevel - 1].int / 60) + ':' + 
+            (game.times[game.currentLevel - 1].int % 60 < 10 ? '0' : '') +
+            game.times[game.currentLevel - 1].int % 60;
 
         if (game.progress > 20) {
             game.totalTime = {
@@ -354,25 +374,6 @@ var playState = {
          * Return to the menu.
          */
         game.state.start('menu');
-    },
-
-    updateTimes: function () {
-        game.cache.getJSON('levels').forEach(playState.loadTimes, playState);
-    },
-
-    loadTimes: function (level) {
-        GJAPI.ScoreFetch(level.score, GJAPI.SCORE_ONLY_USER, 1, this.loadTime);
-    },
-
-    loadTime: function (response) {
-        if (!response.success) {
-            return;
-        }
-        var i = parseInt(response.scores[0].extra_data, 10) - 1;
-        game.times[i] = {
-            string: response.scores[0].score,
-            int: parseInt(response.scores[0].sort, 10)
-        };
     },
 
     sumTimes: function (time) {

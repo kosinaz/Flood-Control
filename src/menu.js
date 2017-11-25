@@ -30,6 +30,11 @@ var menuState = {
             align: "center"
         }
 
+        game.add.text(40, 525, '← ↵ →', {
+            font: 'bold 14pt Arial',
+            fill: '#fff'
+        });
+
         this.texts = [];
 
         this.buttons = [];

@@ -2,6 +2,23 @@ var loadState = {
     preload: function () {
 
         /**
+         * Set the background color.
+         */
+        game.stage.backgroundColor = "#0084c8";
+
+        this.clock = game.add.text(0, 0, '⏳', {
+            boundsAlignH: "center",
+            boundsAlignV: "middle",
+            fill: '#fff',
+            font: 'bold 30pt Arial',
+            align: "center"
+        });
+        this.clock.setTextBounds(0, 0, 1024, 576);
+        this.hour = 0;
+
+        game.time.events.loop(Phaser.Timer.SECOND, this.updateClock, this);
+
+        /**
          * Load the images.
          */ 
         game.load.spritesheet('tileset', 'assets/tileset.png', 96, 96);
@@ -50,11 +67,6 @@ var loadState = {
          */
         game.music = game.add.audio('music', 0.3, true).play();
 
-        /**
-         * Set the background color.
-         */
-        game.stage.backgroundColor = "#0084c8";
-
         if (GJAPI.bActive) {
 
             /**
@@ -82,6 +94,11 @@ var loadState = {
 
             game.state.start('menu');
         }
+    },
+
+    updateClock: function () {
+        this.hour = (this.hour + 1) % 2;
+        this.clock.text = '⏳⌛'[this.hour];
     },
 
     loadTimes: function (level) {
