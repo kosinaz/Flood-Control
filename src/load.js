@@ -106,7 +106,7 @@ var loadState = {
     },
 
     loadTime: function (response) {
-        if (!response.success) {
+        if (!response.success || !response.scores[0]) {
             return;
         }
         var i = parseInt(response.scores[0].extra_data, 10) - 1;
@@ -117,7 +117,7 @@ var loadState = {
     },
 
     loadTotal: function (response) {
-        if (!response.success) {
+        if (!response.success || !response.scores[0]) {
             return;
         }
         game.totalTime = {

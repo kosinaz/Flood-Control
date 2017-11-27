@@ -336,14 +336,15 @@ var playState = {
                 game.currentLevel
             );
         }
-        game.times[game.currentLevel - 1].int = Math.min(
-            this.lastMovement, 
-            game.times[game.currentLevel - 1].int
-        );
-        game.times[game.currentLevel - 1].string = 
-            Math.floor(game.times[game.currentLevel - 1].int / 60) + ':' + 
-            (game.times[game.currentLevel - 1].int % 60 < 10 ? '0' : '') +
-            game.times[game.currentLevel - 1].int % 60;
+        if (!game.times[game.currentLevel - 1] ||
+            game.times[game.currentLevel - 1].int > this.lastMovement) { 
+            game.times[game.currentLevel - 1] = {
+                int: this.lastMovement,
+                string: Math.floor(this.lastMovement / 60) + ':' +
+                    (this.lastMovement % 60 < 10 ? '0' : '') +
+                    this.lastMovement % 60
+            }
+        }            
 
         if (game.progress > 20) {
             game.totalTime = {
@@ -382,7 +383,7 @@ var playState = {
 
     updateTotal: function (response) {
         if (response.success) {
-            if (game.totalTime.int < parseInt(response.scores[0].sort, 10)) {
+            if (game.totalTime.int > parseInt(response.scores[0].sort, 10)) {
                return;
             }
         } 
