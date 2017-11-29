@@ -53,7 +53,7 @@ var menuState = {
             boundsAlignH: "center",
             boundsAlignV: "middle",
             fill: '#ff8',
-            font: 'bold 30pt Arial',
+            font: 'bold 20pt Arial',
             align: "center"
         });
         this.totalTimeLabel.setTextBounds(400, 250, 200, 100);
@@ -120,7 +120,8 @@ var menuState = {
         this.texts.forEach(this.updateTime, this);
 
         if (game.totalTime) {
-            this.totalTimeLabel.text = 'Total\n' + game.totalTime.string;
+            this.totalTimeLabel.text = 'Total time of \n' 
+            + game.totalTime.string;
         }
 
         if (this.keyLeft.justDown) {

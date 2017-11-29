@@ -346,14 +346,7 @@ var playState = {
             }
         }            
 
-        if (game.progress > 20) {
-            game.totalTime = {
-                int: 0,
-                string: '0:00'
-            };
-            game.times.forEach(this.sumTimes, this);
-            GJAPI.ScoreFetch(0, GJAPI.SCORE_ONLY_USER, 1, this.updateTotal);
-        }
+        this.sumTimes();
 
         /**
          * Unlock the next level if needed.
@@ -377,19 +370,61 @@ var playState = {
         game.state.start('menu');
     },
 
-    sumTimes: function (time) {
-        game.totalTime.int += time.int;
+    sumTimes: function () {
+
+        /**
+         * Reset the total time.
+         */
+        game.totalTime = {
+            int: 0,
+            string: '0:00'
+        };
+
+        /**
+         * Check the best time of all levels.
+         */
+        for (var i = 0; i < 20; i += 1) {
+
+            /**
+             * If the player already saved a time for the level.
+             */
+            if (game.times[i]) {
+
+                /**
+                 * Add the best level time to the total time.
+                 */
+                game.totalTime.int += game.times[i].int;
+
+                /**
+                 * Update the total time string with the current level and 
+                 * total time.
+                 */
+                game.totalTime.string = (i + 1) + ' level' + (i ? 's' : '') +
+                    ': ' + Math.floor(game.totalTime.int / 60) + ':' + 
+                    (game.totalTime.int % 60 < 10 ? '0' : '') +
+                    game.totalTime.int % 60
+
+            /**
+             * If the player did not yet saved a time for the level. 
+             */
+            } else {
+
+                /**
+                 * Add the hypothetically maximum time to the sum, but don't
+                 * update the string and display the real total for the player.
+                 */
+                game.totalTime.int += (i + 1) * 12;
+            }
+        }
+        GJAPI.ScoreFetch(0, GJAPI.SCORE_ONLY_USER, 1, this.updateTotal);
     },
 
     updateTotal: function (response) {
-        if (response.success) {
+        if (response.success && response.scores[0]) {
             if (game.totalTime.int > parseInt(response.scores[0].sort, 10)) {
                return;
             }
-        } 
-        game.totalTime.string = Math.floor(game.totalTime.int / 60) + ':' + 
-            (game.totalTime.int % 60 < 10 ? '0' : '') +
-            game.totalTime.int % 60;
+        }
         GJAPI.ScoreAdd(0, game.totalTime.int, game.totalTime.string);
     }
 }
