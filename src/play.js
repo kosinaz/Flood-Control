@@ -335,6 +335,16 @@ var playState = {
                     this.lastMovement % 60,
                 game.currentLevel
             );
+        } else {
+            GJAPI.ScoreAddGuest(
+                (game.currentLevel - 1 ? 1 : 0) + game.currentLevel + 303221,
+                this.lastMovement,
+                Math.floor(this.lastMovement / 60) + ':' +
+                (this.lastMovement % 60 < 10 ? '0' : '') +
+                this.lastMovement % 60,
+                'Unnamed Hero',
+                game.currentLevel
+            );
         }
         if (!game.times[game.currentLevel - 1] ||
             game.times[game.currentLevel - 1].int > this.lastMovement) { 
@@ -344,7 +354,7 @@ var playState = {
                     (this.lastMovement % 60 < 10 ? '0' : '') +
                     this.lastMovement % 60
             }
-        }            
+        }         
 
         this.sumTimes();
 
@@ -416,7 +426,16 @@ var playState = {
                 game.totalTime.int += (i + 1) * 12;
             }
         }
-        GJAPI.ScoreFetch(0, GJAPI.SCORE_ONLY_USER, 1, this.updateTotal);
+        if (GJAPI.bActive) {
+            GJAPI.ScoreFetch(0, GJAPI.SCORE_ONLY_USER, 1, this.updateTotal);
+        } else {
+            GJAPI.ScoreAddGuest(
+                0, 
+                game.totalTime.int, 
+                game.totalTime.string,
+                'Unnamed Hero'
+            );
+        }
     },
 
     updateTotal: function (response) {
